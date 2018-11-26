@@ -4,11 +4,9 @@ Système de recommandation de profil de personnes à rencontrer lors d'événeme
 
 git clone https://github.com/alexandre-cruel/Swapcard-Project 
 
-
-
-##Dev team :  
-    * Baptiste Chevallier  
-    * Raphaël Champeaud  
-    * Alexandre Cruel  
+## Dev team :  
+* Baptiste Chevallier  
+* Raphaël Champeaud  
+* Alexandre Cruel  
 
 
