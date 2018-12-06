@@ -11,36 +11,33 @@ model = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', 
 # model.wv.save_word2vecformat('googlenews.txt')
 print('Modele build')
 
-#model = model.reshape(1, -1)
-
-db = DBSCAN(eps=0.3, min_samples=1000000).fit(model)
-
-core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
-core_samples_mask[db.core_sample_indices_] = True
-labels = db.labels_
-
-n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
-n_noise_ = list(labels).count(-1)
-
-print('Estimated number of clusters: %d' % n_clusters_)
-print('Estimated number of noise points: %d' % n_noise_)
-
 condSortie = 1
 
-while condSortie != 0:
-    myInput = input("Entrez le mot à trouver : ")
-    word = trad.translate(myInput)
-    print('# of words', len(model.wv.vocab))
-    print('sample words', list(model.wv.vocab.keys())[:10])
+# while condSortie != 0:
+# myInput = input("Entrez le mot à trouver : ")
+#  = trad.translate(myInput)
 
-    # all the vocabulary is in this format : STD + word (for regular tags) COMPANY + word, INDUSTRY + word
+word = "engineer"
+word2 = "electrical_engineer"
+word3 = "mechanical_engineer"
 
-    print(f'most similar words to {word} :\n{model.most_similar(word)}')
-    # print(f'vector of word :\n{model[word]}')
+# print('# of words', len(model.wv.vocab))
+# print('sample words', list(model.wv.vocab.keys())[:10])
 
-    # Some maths
+print(f'most similar words to {word} :\n{model.most_similar(word)}')
+print(f'most similar words to {word2} :\n{model.most_similar(word)}')
+print(f'most similar words to {word3} :\n{model.most_similar(word)}')
 
-    # print(stereotype)
-    condSortie = input("Sortir ? :")
+vec1 = model[word]
+vec2 = model[word2]
+vec3 = model[word3]
+
+vecCentroide = []
+
+for x in range(0, len(vec1)):
+    vecCentroide.append((vec1[x]+vec2[x]+vec3[x])/3)
 
 
+
+# print(f'vector of word :\n{model[word]}')
+print(f'vector of centroid :\n{vecCentroide}')
