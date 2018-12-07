@@ -17,27 +17,30 @@ condSortie = 1
 # myInput = input("Entrez le mot à trouver : ")
 #  = trad.translate(myInput)
 
-word = "engineer"
-word2 = "electrical_engineer"
-word3 = "mechanical_engineer"
+
+clusterInge = ["engineer","electrical_engineer","mechanical_engineer"]
+vecClusterInge = []
+
+clusterCEO = []
+
+for x in clusterInge:
+    print(f'most similar words to {x} :\n{model.most_similar(x)}')
+    vecClusterInge.append(model[x])
 
 # print('# of words', len(model.wv.vocab))
 # print('sample words', list(model.wv.vocab.keys())[:10])
 
-print(f'most similar words to {word} :\n{model.most_similar(word)}')
-print(f'most similar words to {word2} :\n{model.most_similar(word)}')
-print(f'most similar words to {word3} :\n{model.most_similar(word)}')
+acc = 0
 
-vec1 = model[word]
-vec2 = model[word2]
-vec3 = model[word3]
+vecCentroid = []
 
-vecCentroide = []
+for y in range(0, len(vecClusterInge[0])):
+    for x in vecClusterInge:
+        acc = acc + x[y]
 
-for x in range(0, len(vec1)):
-    vecCentroide.append((vec1[x]+vec2[x]+vec3[x])/3)
-
+    vecCentroid.append(acc/(len(clusterInge)))
+    acc = 0
 
 
 # print(f'vector of word :\n{model[word]}')
-print(f'vector of centroid :\n{vecCentroide}')
+print(f'vector of centroid :\n{vecCentroid}')
