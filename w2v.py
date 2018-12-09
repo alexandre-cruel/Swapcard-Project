@@ -1,15 +1,11 @@
 from gensim.models import KeyedVectors
 from translate import Translator
-from sklearn.cluster import DBSCAN
-import numpy as np
-from sklearn import metrics
-
 
 trad = Translator(from_lang='fr', to_lang="en")
 
 model = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
-# model.wv.save_word2vecformat('googlenews.txt')
-print('Modele build')
+
+print('Model build')
 
 condSortie = 1
 
@@ -18,29 +14,45 @@ condSortie = 1
 #  = trad.translate(myInput)
 
 
-clusterInge = ["engineer","electrical_engineer","mechanical_engineer"]
-vecClusterInge = []
+clusterInge = ["engineer", "electrical_engineer", "mechanical_engineer", "engineering"]
 
-clusterCEO = []
+clusterCEO = ["Director", "CEO","Executive_Director", "Vice_President", "director", "General_Manager","President"]
 
-for x in clusterInge:
-    print(f'most similar words to {x} :\n{model.most_similar(x)}')
-    vecClusterInge.append(model[x])
 
-# print('# of words', len(model.wv.vocab))
-# print('sample words', list(model.wv.vocab.keys())[:10])
+def fillveccluster(namelist):
+    vec = []
+    for a in namelist:
+        vec.append(model[a])
+    return vec
 
-acc = 0
 
-vecCentroid = []
-
-for y in range(0, len(vecClusterInge[0])):
-    for x in vecClusterInge:
-        acc = acc + x[y]
-
-    vecCentroid.append(acc/(len(clusterInge)))
+def calccentroid(vec):
+    centroid = []
     acc = 0
+    for y in range(0, len(vec[0])):
+        for x in vec:
+            acc = acc + x[y]
 
+        centroid.append(acc / (len(vec)))
+        acc = 0
+    return centroid
+
+
+def calcdist(vec1,vec2):
+    print('WIP')
+    return 0
+
+
+vecClusterInge = fillveccluster(clusterInge)
+vecClusterCEO = fillveccluster(clusterCEO)
+ingeCentroid = calccentroid(vecClusterInge)
+ceoCentroid = calccentroid(vecClusterCEO)
+
+dist = calcdist(ingeCentroid, ceoCentroid)
 
 # print(f'vector of word :\n{model[word]}')
-print(f'vector of centroid :\n{vecCentroid}')
+print(f'vector of centroid for inge cluster :\n{ingeCentroid}')
+print(f'vector of centroid for inge cluster :\n{ceoCentroid}')
+print(f'Dist between them : {dist}')
+
+
