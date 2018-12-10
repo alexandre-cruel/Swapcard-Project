@@ -18,6 +18,9 @@ clusterInge = ["engineer", "electrical_engineer", "mechanical_engineer", "engine
 
 clusterCEO = ["Director", "CEO","Executive_Director", "Vice_President", "director", "General_Manager","President"]
 
+myword = "engineer"
+mywordvec = model[myword]
+
 
 def fillveccluster(namelist):
     vec = []
@@ -39,8 +42,11 @@ def calccentroid(vec):
 
 
 def calcdist(vec1,vec2):
-    print('WIP')
-    return 0
+    acc = 0
+    for x in range(0, len(vec1)):
+        acc += pow(vec1[x]-vec2[x], 2)
+
+    return pow(acc, 1/2)
 
 
 vecClusterInge = fillveccluster(clusterInge)
@@ -53,6 +59,9 @@ dist = calcdist(ingeCentroid, ceoCentroid)
 # print(f'vector of word :\n{model[word]}')
 print(f'vector of centroid for inge cluster :\n{ingeCentroid}')
 print(f'vector of centroid for inge cluster :\n{ceoCentroid}')
-print(f'Dist between them : {dist}')
+
+print(f'\n\nThe word : {myword} is {calcdist(mywordvec,ingeCentroid)} away from Inge cluster \nand {calcdist(mywordvec, ceoCentroid)} away from CEO cluster')
+
+
 
 
