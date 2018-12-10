@@ -12,7 +12,7 @@ print('Modele build')
 # myInput = input("Entrez le mot à trouver : ")
 #  = trad.translate(myInput)
 
-clusterCEO = ["Director", "CEO","Executive_Director", "Vice_President", "director", "General_Manager","President"]
+clusterCEO = ["Management", "Manager"]
 
 
 for a in clusterCEO:

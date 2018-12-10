@@ -16,7 +16,9 @@ condSortie = 1
 
 clusterInge = ["engineer", "electrical_engineer", "mechanical_engineer", "engineering"]
 
-clusterCEO = ["Director", "CEO","Executive_Director", "Vice_President", "director", "General_Manager","President"]
+clusterCEO = ["Director", "CEO", "Executive_Director", "Vice_President", "director", "President"]
+
+clusterManagement = ["Manager", "General_Manager", "Coordinator", "manager", "Product_Manager"]
 
 myword = "engineer"
 mywordvec = model[myword]
@@ -51,17 +53,23 @@ def calcdist(vec1,vec2):
 
 vecClusterInge = fillveccluster(clusterInge)
 vecClusterCEO = fillveccluster(clusterCEO)
+vecClusterManagement = fillveccluster(clusterManagement)
+
 ingeCentroid = calccentroid(vecClusterInge)
 ceoCentroid = calccentroid(vecClusterCEO)
+managementCentroid = calccentroid(vecClusterManagement)
 
-dist = calcdist(ingeCentroid, ceoCentroid)
 
 # print(f'vector of word :\n{model[word]}')
 print(f'vector of centroid for inge cluster :\n{ingeCentroid}')
 print(f'vector of centroid for inge cluster :\n{ceoCentroid}')
 
-print(f'\n\nThe word : {myword} is {calcdist(mywordvec,ingeCentroid)} away from Inge cluster \nand {calcdist(mywordvec, ceoCentroid)} away from CEO cluster')
-
+print(f'\n\nThe word : {myword} is {calcdist(mywordvec,ingeCentroid)} away from '
+      f'Inge cluster \nand {calcdist(mywordvec, ceoCentroid)} away from CEO cluster '
+      f'\n and {calcdist(mywordvec, managementCentroid)} away from Management cluster. \n\n '
+      f'Distance between inge and CEO is {calcdist(ceoCentroid,ingeCentroid)} \n '
+      f'Distance between inge and management is {calcdist(managementCentroid,ingeCentroid)} \n'
+      f'Distance between CEO and management is {calcdist(managementCentroid,ceoCentroid)}')
 
 
 
