@@ -14,7 +14,9 @@ matplotlib.rc('font', **font)
 
 db_connection = sql.connect(host='localhost', database='swap_card', user='root', password='password')
 
-dfJobTtl = pd.read_sql("select * from user where job_title is not NULL and not tags='[]' and not companies='[]'", con=db_connection)
+#dfJobTtl = pd.read_sql("select * from user where job_title is not NULL and not tags='[]' and not companies='[]'", con=db_connection)
+
+dfJobTtl = pd.read_sql("select job_title,companies,tags from user where not tags='[]' and not companies='[]' and job_title='Engineer' or job_title='Ingénieur'", con=db_connection)
 
 dfJobTtl = dfJobTtl.drop(['educations', 'second_job_title'], axis=1)
 
@@ -44,4 +46,4 @@ orderedJobTitles.plot(kind='pie')
 
 plt.show()
 
-#db.scan
+

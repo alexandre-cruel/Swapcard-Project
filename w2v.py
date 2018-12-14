@@ -71,5 +71,13 @@ print(f'\n\nThe word : {myword} is {calcdist(mywordvec,ingeCentroid)} away from 
       f'Distance between inge and management is {calcdist(managementCentroid,ingeCentroid)} \n'
       f'Distance between CEO and management is {calcdist(managementCentroid,ceoCentroid)}')
 
+# ratio levenstein
 
+# 2 liste tuple liste avec le mot + index / vecteur index
+
+# Liste de vecteur dans DBSCAN
+
+# Counter == Value_counts
+
+#
 
