@@ -16,9 +16,9 @@ db_connection = sql.connect(host='localhost', database='swap_card', user='root',
 
 #dfJobTtl = pd.read_sql("select * from user where job_title is not NULL and not tags='[]' and not companies='[]'", con=db_connection)
 
-dfJobTtl = pd.read_sql("select job_title,companies,tags from user where not tags='[]' and not companies='[]' and job_title='Engineer' or job_title='Ingénieur'", con=db_connection)
+dfJobTtl = pd.read_sql("select job_title from user where not tags='[]' and not companies='[]'", con=db_connection)
 
-dfJobTtl = dfJobTtl.drop(['educations', 'second_job_title'], axis=1)
+#dfJobTtl = dfJobTtl.drop(['educations', 'second_job_title'], axis=1)
 
 dfJobTtl = dfJobTtl.replace(["Dirigeant","Futur Dirigeant","CEO","Président","Directeur Général","Directeur"], "Poste de direction")
 
@@ -42,7 +42,7 @@ for x in range(0,len(orderedJobTitles)):
     if orderedJobTitles[x] <= 5000:
         orderedJobTitles[x] = 0
 
-orderedJobTitles.plot(kind='pie')
+orderedJobTitles.plot(kind='bar')
 
 plt.show()
 
