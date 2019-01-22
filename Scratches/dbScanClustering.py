@@ -6,12 +6,12 @@ from sklearn.cluster import DBSCAN
 import pickle
 
 
-db_connection = sql.connect(host='localhost', database='swap_card', user='root', password='password')
+#db_connection = sql.connect(host='localhost', database='swap_card', user='root', password='password')
 
-dfJobTtl = pd.read_sql("select job_title from user where not tags='[]' and not companies='[]' group by job_title order by count(*) desc limit 100", con=db_connection)
-dfJobTtl = dfJobTtl.iloc[2:]
+#dfJobTtl = pd.read_sql("select job_title from user where not tags='[]' and not companies='[]' group by job_title order by count(*) desc limit 100", con=db_connection)
+#dfJobTtl = dfJobTtl.iloc[2:]
 
-dfJobTtl = dfJobTtl.replace([""])
+#dfJobTtl = dfJobTtl.replace([""])
 
 #print(dfJobTtl.head())
 
@@ -31,6 +31,7 @@ def fillveccluster(namelist):
 
 
 vectors = fillveccluster(job_list)
+
 pickle.dump(vectors, open('foo', 'wb'))
 
 dbVec = [v[1] for v in vectors]
