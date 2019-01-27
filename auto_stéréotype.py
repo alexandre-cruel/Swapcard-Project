@@ -1,5 +1,5 @@
 from gensim.models import KeyedVectors
-from translate import Translator
+from traductrion import Translator
 import pymysql as sql
 import pandas as pd
 from sklearn.cluster import DBSCAN
@@ -29,7 +29,7 @@ def fillveccluster(namelist):
 
 
 vectors = fillveccluster(job_list)
-pickle.dump(vectors,open('foo','wb'))
+#pickle.dump(vectors,open('foo','wb'))
 
 dbVec = [v[1] for v in vectors]
 

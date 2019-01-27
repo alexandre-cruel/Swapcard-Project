@@ -1,5 +1,5 @@
 from gensim.models import KeyedVectors
-from translate import Translator
+from traduction import Translator
 
 trad = Translator(from_lang='fr', to_lang="en")
 
