@@ -16,7 +16,7 @@ vec = []
 db_connection = sql.connect(host='localhost', database='swapcard', user='root', password='coucou74')
 
 #create dataframe from our db
-dfJobTtl = pd.read_sql("select job_title from user where not tags='[]' and not companies='[]' group by job_title order by count(*) desc limit 100", con=db_connection)
+dfJobTtl = pd.read_sql("select job_title from user where not tags='[]' and not companies='[]' group by job_title order by count(*) desc limit 500", con=db_connection)
 dfJobTtl = dfJobTtl.loc[2:]
 print(dfJobTtl.head())
 
@@ -33,7 +33,7 @@ print(text2)
 #removing characters
 sentences = text2.replace(',', '').replace('&', '').replace('.', '').replace('(','').replace(')', '').replace('/', ' ')\
     .replace('[', '').replace(']', '').replace('-', ' ').replace('_', ' ').replace('+', '').replace('’', '')\
-    .replace("'", ' ').replace('la', '').replace('des', '').replace('demploi', 'emploi')
+    .replace("'", ' ').replace('demploi', 'emploi').replace('and', '')
 
 #suppression de mots de 2 lettres ou moins
 tab = sentences.split()
