@@ -1,14 +1,17 @@
-import string
-from gensim.models import KeyedVectors
-import pymysql as sql
-import pandas as pd
-from sklearn.cluster import DBSCAN
 import pickle
+import string
+
 import nltk
+import pandas as pd
+import pymysql as sql
+from gensim.models import KeyedVectors
+from gensim.models import FastText
+from sklearn.cluster import DBSCAN
+
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 from string import digits
-from translate import Translator
+
 
 tab = []
 vec = []
@@ -55,21 +58,21 @@ print(tagged[0:6])
 
 #job_list = ['Director', 'CEO', 'CEO', 'Engineer', 'Managing_Director', 'marketing']
 
-vectors = pickle.load(open('foo','rb'))
-model = KeyedVectors.load_word2vec_format('GoogleNews-vectors-negative300.bin', binary=True)
+#vectors = pickle.load(open('foo','rb'))
+model = KeyedVectors.load_word2vec_format('wiki.fr.align.vec')
+#model = KeyedVectors.load_word2vec_format('wiki.en.align.vec')
 
 print('Model build')
-
-trad = Translator(from_lang='fr', to_lang="en")
 
 
 def fillveccluster(namelist):
     vec = []
     for a in namelist:
-        vec.append((a,model[a]))
+        vec.append((a, model[a]))
     return vec
 
 vectors = fillveccluster(tokens)
+pickle.dump(vectors,open('foo','wb'))
 
 dbVec = [v[1] for v in vectors]
 
