@@ -1,3 +1,4 @@
+import string
 from gensim.models import KeyedVectors
 import pymysql as sql
 import pandas as pd
@@ -16,7 +17,7 @@ vec = []
 db_connection = sql.connect(host='localhost', database='swapcard', user='root', password='coucou74')
 
 #create dataframe from our db
-dfJobTtl = pd.read_sql("select job_title from user where not tags='[]' and not companies='[]' group by job_title order by count(*) desc limit 500", con=db_connection)
+dfJobTtl = pd.read_sql("select job_title from user where not tags='[]' and not companies='[]' group by job_title order by count(*) desc limit 100", con=db_connection)
 dfJobTtl = dfJobTtl.loc[2:]
 print(dfJobTtl.head())
 
@@ -31,9 +32,9 @@ print(text2)
 
 
 #removing characters
-sentences = text2.replace(',', '').replace('&', '').replace('.', '').replace('(','').replace(')', '').replace('/', ' ')\
-    .replace('[', '').replace(']', '').replace('-', ' ').replace('_', ' ').replace('+', '').replace('’', '')\
-    .replace("'", ' ').replace('demploi', 'emploi').replace('and', '')
+table = str.maketrans({key: ' ' for key in string.punctuation})
+sentences = text2.translate(table).replace('d’', ' ')
+
 
 #suppression de mots de 2 lettres ou moins
 tab = sentences.split()
@@ -61,20 +62,12 @@ print('Model build')
 
 trad = Translator(from_lang='fr', to_lang="en")
 
+
 def fillveccluster(namelist):
     vec = []
     for a in namelist:
-        try:
-            vec.append((a, model[a]))
-        except KeyError as e:
-            print(e)
-            #a = trad.translate(a, model[a])
-            #vec.append((a, model[a]))
-            #vec.append(trad.translate(e()), model[e()])
-
-
+        vec.append((a,model[a]))
     return vec
-
 
 vectors = fillveccluster(tokens)
 
@@ -86,7 +79,3 @@ print(cluster.labels_)
 #print(cluster.components_)
 
 
-"""for i in cluster.labels_:
-         if i == 0:
-             print('Le stéréotype de notre cold start qui à pour métier', job_list[0], 'est :', 'mettre ici les autres jobs ressemblants')
-"""
