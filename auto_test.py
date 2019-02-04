@@ -5,7 +5,7 @@ import nltk
 import pandas as pd
 import pymysql as sql
 from gensim.models import KeyedVectors
-from gensim.models import FastText
+from gensim.models import FastText as ft
 from sklearn.cluster import DBSCAN
 
 nltk.download('punkt')
@@ -39,6 +39,9 @@ table = str.maketrans({key: ' ' for key in string.punctuation})
 sentences = text2.translate(table).replace('d’', ' ')
 
 
+#convert string to lowercase
+sentences = sentences.lower()
+
 #suppression de mots de 2 lettres ou moins
 tab = sentences.split()
 for i in tab:
@@ -59,8 +62,12 @@ print(tagged[0:6])
 #job_list = ['Director', 'CEO', 'CEO', 'Engineer', 'Managing_Director', 'marketing']
 
 #vectors = pickle.load(open('foo','rb'))
-model = KeyedVectors.load_word2vec_format('wiki.fr.align.vec')
+#model = KeyedVectors.load_word2vec_format('wiki.fr.align.vec')
 #model = KeyedVectors.load_word2vec_format('wiki.en.align.vec')
+
+
+model = KeyedVectors.load_word2vec_format('wiki.fr.align.vec')
+
 
 print('Model build')
 
