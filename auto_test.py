@@ -60,28 +60,17 @@ print(tagged[0:6])
 
 #job_list = ['Director', 'CEO', 'CEO', 'Engineer', 'Managing_Director', 'marketing']
 
-#vectors = pickle.load(open('foo','rb'))
-#model = KeyedVectors.load_word2vec_format('wiki.fr.align.vec')
-#model = KeyedVectors.load_word2vec_format('wiki.en.align.vec')
-
-
 model = KeyedVectors.load_word2vec_format('wiki.fr.align.vec')
 
-
 print('Model build')
-
 
 def fillveccluster(namelist):
     vec = []
     for a in namelist:
         if a in model.vocab:
-            vec.append((a, model[a]))
-        else:
-
+            words = a
+            vec.append((words, model[words]))
     return vec
-
-#for doc in labeled_corpus:
-    #words = filter(lambda x: x in model.vocab, doc.words)
 
 vectors = fillveccluster(tokens)
 #pickle.dump(vectors,open('foo','wb'))
