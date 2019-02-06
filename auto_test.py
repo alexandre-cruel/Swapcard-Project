@@ -5,7 +5,6 @@ import nltk
 import pandas as pd
 import pymysql as sql
 from gensim.models import KeyedVectors
-from gensim.models import FastText as ft
 from sklearn.cluster import DBSCAN
 
 nltk.download('punkt')
@@ -75,15 +74,21 @@ print('Model build')
 def fillveccluster(namelist):
     vec = []
     for a in namelist:
-        vec.append((a, model[a]))
+        if a in model.vocab:
+            vec.append((a, model[a]))
+        else:
+
     return vec
 
+#for doc in labeled_corpus:
+    #words = filter(lambda x: x in model.vocab, doc.words)
+
 vectors = fillveccluster(tokens)
-pickle.dump(vectors,open('foo','wb'))
+#pickle.dump(vectors,open('foo','wb'))
 
 dbVec = [v[1] for v in vectors]
 
-cluster = DBSCAN(eps=0.4, min_samples=1, metric='cosine').fit(dbVec)
+cluster = DBSCAN(eps=0.4, min_samples=2, metric='cosine').fit(dbVec)
 
 print(cluster.labels_)
 #print(cluster.components_)
