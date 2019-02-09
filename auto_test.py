@@ -57,12 +57,14 @@ print(tagged[0:6])
 
 
 #####################################################
+#fr_dictionary = KeyedVectors.load_word2vec_format('wiki.fr.align.vec')
+#en_dictionary = KeyedVectors.load_word2vec_format('wiki.en.align.vec')
 
-#job_list = ['Director', 'CEO', 'CEO', 'Engineer', 'Managing_Director', 'marketing']
 
-model = KeyedVectors.load_word2vec_format('wiki.fr.align.vec')
+model = KeyedVectors.load_word2vec_format('wiki.fr.align.vec').load_word2vec_format('wiki.en.align.vec')
 
-print('Model build')
+print('Model built')
+
 
 def fillveccluster(namelist):
     vec = []
