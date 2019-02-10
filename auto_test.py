@@ -57,10 +57,8 @@ print(tagged[0:6])
 
 
 #####################################################
-#fr_dictionary = KeyedVectors.load_word2vec_format('wiki.fr.align.vec')
-#en_dictionary = KeyedVectors.load_word2vec_format('wiki.en.align.vec')
 
-
+vectors = pickle.load(open('foo','rb'))
 model = KeyedVectors.load_word2vec_format('wiki.fr.align.vec').load_word2vec_format('wiki.en.align.vec')
 
 print('Model built')
@@ -79,7 +77,7 @@ vectors = fillveccluster(tokens)
 
 dbVec = [v[1] for v in vectors]
 
-cluster = DBSCAN(eps=0.4, min_samples=2, metric='cosine').fit(dbVec)
+cluster = DBSCAN(eps=0.4, min_samples=3, metric='cosine').fit(dbVec)
 
 print(cluster.labels_)
 #print(cluster.components_)
