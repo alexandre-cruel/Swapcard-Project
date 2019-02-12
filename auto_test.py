@@ -94,6 +94,10 @@ for i in cluster.labels_:
     tot = tot +1
 print('On a ', tot, 'mots dans notre liste de métiers')
 print(num_out, 'ne sont pas compris dans un cluster')
+percent = round(num_out/tot * 100, 2)
+print('Le pourcentage de mots non-clusterisés est de :', percent, '%')
+
+
 
 
 
