@@ -59,7 +59,7 @@ print(tagged[0:6])
 #####################################################
 
 vectors = pickle.load(open('foo','rb'))
-model = KeyedVectors.load_word2vec_format('wiki.fr.align.vec').load_word2vec_format('wiki.en.align.vec')
+model = KeyedVectors.load_word2vec_format('testvec')
 
 print('Model built')
 
@@ -82,9 +82,22 @@ cluster = DBSCAN(eps=0.3, min_samples=3, metric='cosine').fit(dbVec)
 print(cluster.labels_)
 
 #compter nombre de clusters
+count = 0
 for i in range(min(cluster.labels_), max(cluster.labels_)):
     nbr = max(cluster.labels_) +1
 print('On a ', nbr, 'clusters !')
+
+#compter nombre de mots pas clusterisés
+num_out = (cluster.labels_ == -1).sum()
+tot = 0
+for i in cluster.labels_:
+    tot = tot +1
+print('On a ', tot, 'mots dans notre liste de métiers')
+print(num_out, 'ne sont pas compris dans un cluster')
+
+
+
+
 
 #################################################
 #################################################
