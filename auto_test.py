@@ -77,7 +77,7 @@ vectors = fillveccluster(tokens)
 
 dbVec = [v[1] for v in vectors]
 
-cluster = DBSCAN(eps=0.3, min_samples=3, metric='cosine').fit(dbVec)
+cluster = DBSCAN(eps=0.5, min_samples=2, metric='cosine').fit(dbVec)
 
 print(cluster.labels_)
 
@@ -94,19 +94,20 @@ for i in cluster.labels_:
     tot = tot +1
 print('On a ', tot, 'mots dans notre liste de métiers')
 print(num_out, 'ne sont pas compris dans un cluster')
-percent = round(num_out/tot * 100, 2)
-print('Le pourcentage de mots non-clusterisés est de :', percent, '%')
-
-
-
-
-
+percent = 100 - round(num_out/tot * 100, 2)
+print('Le pourcentage de mots clusterisés est de :', percent, '%')
 
 
 #################################################
 #################################################
-#################################################
-#################################################
+
+
+#réajustement des paramètres pour bon clustering
+
+
+
+
+
 
 """
 from sklearn import metrics
