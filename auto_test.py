@@ -87,13 +87,14 @@ for i in range(min(cluster.labels_), max(cluster.labels_)):
     nbr = max(cluster.labels_) +1
 print('On a ', nbr, 'clusters !')
 
-#compter nombre de mots pas clusterisés
+#compter nombre de mots clusterisés
 num_out = (cluster.labels_ == -1).sum()
 tot = 0
 for i in cluster.labels_:
     tot = tot +1
 print('On a ', tot, 'mots dans notre liste de métiers')
 print(num_out, 'ne sont pas compris dans un cluster')
+
 percent = 100 - round(num_out/tot * 100, 2)
 print('Le pourcentage de mots clusterisés est de :', percent, '%')
 
@@ -101,15 +102,8 @@ print('Le pourcentage de mots clusterisés est de :', percent, '%')
 #################################################
 #################################################
 
+# PLOTTING OUR WORDS TO SEE REPARTITION
 
-#réajustement des paramètres pour bon clustering
-
-
-
-
-
-
-"""
 from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 from sklearn.datasets.samples_generator import make_blobs
@@ -118,17 +112,14 @@ import numpy as np
 
 # Generate sample data
 centers = [[1, 1], [-1, -1], [1, -1]]
-cluster, labels_true = make_blobs(n_samples= cluster.labels_, centers=centers, cluster_std=0.4,
+X, labels_true = make_blobs(n_samples= tot, centers=centers, cluster_std=0.4,
                             random_state=0)
-
 X = StandardScaler().fit_transform(X)
 
-# #############################################################################
 # Compute DBSCAN
-db = DBSCAN(eps=0.3, min_samples=10).fit(X)
-core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
-core_samples_mask[db.core_sample_indices_] = True
-labels = db.labels_
+core_samples_mask = np.zeros_like(cluster.labels_, dtype=bool)
+core_samples_mask[cluster.core_sample_indices_] = True
+labels = cluster.labels_
 
 # Number of clusters in labels, ignoring noise if present.
 n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
@@ -168,6 +159,5 @@ for k, col in zip(unique_labels, colors):
              markeredgecolor='k', markersize=6)
 
 plt.title('Estimated number of clusters: %d' % n_clusters_)
-plt.show()"""
-
+plt.show()
 
