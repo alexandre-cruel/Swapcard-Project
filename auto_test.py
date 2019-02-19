@@ -77,7 +77,7 @@ vectors = fillveccluster(tokens)
 
 dbVec = [v[1] for v in vectors]
 
-cluster = DBSCAN(eps=0.5, min_samples=2, metric='cosine').fit(dbVec)
+cluster = DBSCAN(eps=0.5, min_samples=1, metric='cosine').fit(dbVec)
 
 print(cluster.labels_)
 
@@ -99,8 +99,8 @@ percent = 100 - round(num_out/tot * 100, 2)
 print('Le pourcentage de mots clusterisés est de :', percent, '%')
 
 
-#################################################
-#################################################
+###############################################################################################################
+###############################################################################################################
 
 # PLOTTING OUR WORDS TO SEE REPARTITION
 
@@ -111,9 +111,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Generate sample data
-centers = [[1, 1], [-1, -1], [1, -1]]
-X, labels_true = make_blobs(n_samples= tot, centers=centers, cluster_std=0.4,
-                            random_state=0)
+#centers = [[1, 1], [-1, -1], [1, -1]]
+X, labels_true = make_blobs(n_samples= tot, random_state=0)
 X = StandardScaler().fit_transform(X)
 
 # Compute DBSCAN
@@ -151,7 +150,7 @@ for k, col in zip(unique_labels, colors):
     class_member_mask = (labels == k)
 
     xy = X[class_member_mask & core_samples_mask]
-    plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),
+    plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),   # 'o' : marker en forme de cercle
              markeredgecolor='k', markersize=14)
 
     xy = X[class_member_mask & ~core_samples_mask]
@@ -160,4 +159,20 @@ for k, col in zip(unique_labels, colors):
 
 plt.title('Estimated number of clusters: %d' % n_clusters_)
 plt.show()
+
+
+############################################################################################
+
+from sklearn import decomposition
+from sklearn import preprocessing
+
+std_scale = preprocessing.StandardScaler().fit(X)
+X_scaled = std_scale.transform(X)
+pca = decomposition.PCA(n_components=2)
+pca.fit(X_scaled)
+
+print(pca.explained_variance_ratio_)
+print(pca.explained_variance_ratio_.sum())
+
+
 
