@@ -1,4 +1,4 @@
-# Swapcard-Project : Projet Data-Science Ingé3 Esme Sudria
+# Swapcard-Project : Projet Data-Science Master2 Esme Sudria
 
 Système de recommandation de profil de personnes à rencontrer lors d'événements.
 
