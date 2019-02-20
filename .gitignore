@@ -86,3 +86,6 @@ fabric.properties
 .idea/httpRequests
 
 /GoogleNews-vectors-negative300.bin
+/googlenews.txt.bz2
+/.idea/
+.DS_Store
