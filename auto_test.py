@@ -103,7 +103,7 @@ print('Le pourcentage de mots clusterisés est de :', percent, '%')
 ###############################################################################################################
 
 # PLOTTING OUR WORDS TO SEE REPARTITION
-
+"""
 from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 from sklearn.datasets.samples_generator import make_blobs
@@ -159,10 +159,12 @@ for k, col in zip(unique_labels, colors):
 
 plt.title('Estimated number of clusters: %d' % n_clusters_)
 plt.show()
-
+"""
 
 ############################################################################################
 
+#Performing PCA
+"""
 from sklearn import decomposition
 from sklearn import preprocessing
 
@@ -171,8 +173,26 @@ X_scaled = std_scale.transform(X)
 pca = decomposition.PCA(n_components=2)
 pca.fit(X_scaled)
 
+print(pca.n_components_)
 print(pca.explained_variance_ratio_)
 print(pca.explained_variance_ratio_.sum())
+"""
+
+#############################################################################################
+#############################################################################################
+
+#Récupération du Cold Start Candidate
+job = input("Entrez votre métier: ")
+
+if job in model.vocab:
+    print("Bonjour, j'ai cru comprendre que vous êtes", job)
+else:
+    print('Le métier que vous avez renseigné n est pas valide, merci de renseigner une profession VALIDE')  #prends aussi en compte les nombres et caractères !
 
 
 
+
+#Placement du candidate dans nos clusters
+
+
+#Renvoyer les termes les plus proches de notre candidat
