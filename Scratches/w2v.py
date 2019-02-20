@@ -21,6 +21,10 @@ clusterCEO = ["Director", "CEO", "Executive_Director", "Vice_President", "direct
 clusterManagement = ["Manager", "General_Manager", "Coordinator", "manager", "Product_Manager"]
 
 myword = "engineer"
+
+print("Mots proches de engineer")
+print(model.most_similar(myword))
+
 mywordvec = model[myword]
 
 
