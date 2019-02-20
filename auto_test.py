@@ -56,7 +56,7 @@ tagged = nltk.pos_tag(tokens)
 print(tagged[0:6])
 
 
-#####################################################
+###################################################################################################
 
 vectors = pickle.load(open('foo','rb'))
 model = KeyedVectors.load_word2vec_format('testvec')
@@ -64,12 +64,35 @@ model = KeyedVectors.load_word2vec_format('testvec')
 print('Model built')
 
 
+##################################################################################################
+
+#Récupération du Cold Start Candidate
+entree = input("Entrez votre métier: ")
+
+for i in entree:
+    # vérifier que ces mots sont dans le vocabulaire
+    if i in model.vocab:                                            
+        print("Bonjour, j'ai cru comprendre que vous êtes", entree)
+        #moyenne des vecteurs
+else:
+    print('Le métier que vous avez renseigné n est pas valide, merci de renseigner une profession VALIDE')
+
+
+
+#Placement du candidate dans nos clusters
+print(model.wv.most_similar(positive=job, topn=3))
+
+
+
+#Renvoyer les termes les plus proches de notre candidat
+
+###################################################################################################
+
 def fillveccluster(namelist):
     vec = []
     for a in namelist:
         if a in model.vocab:
-            words = a
-            vec.append((words, model[words]))
+            vec.append((a, model[a]))
     return vec
 
 vectors = fillveccluster(tokens)
@@ -80,6 +103,8 @@ dbVec = [v[1] for v in vectors]
 cluster = DBSCAN(eps=0.5, min_samples=1, metric='cosine').fit(dbVec)
 
 print(cluster.labels_)
+
+###################################################################################################
 
 #compter nombre de clusters
 count = 0
@@ -179,20 +204,5 @@ print(pca.explained_variance_ratio_.sum())
 """
 
 #############################################################################################
-#############################################################################################
-
-#Récupération du Cold Start Candidate
-job = input("Entrez votre métier: ")
-
-if job in model.vocab:
-    print("Bonjour, j'ai cru comprendre que vous êtes", job)
-else:
-    print('Le métier que vous avez renseigné n est pas valide, merci de renseigner une profession VALIDE')  #prends aussi en compte les nombres et caractères !
 
 
-
-
-#Placement du candidate dans nos clusters
-
-
-#Renvoyer les termes les plus proches de notre candidat
