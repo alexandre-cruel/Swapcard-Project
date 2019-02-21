@@ -11,10 +11,6 @@ nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 from string import digits
 
-
-tab = []
-vec = []
-
 #connect to sql db
 db_connection = sql.connect(host='localhost', database='swapcard', user='root', password='coucou74')
 
@@ -42,6 +38,7 @@ sentences = text2.translate(table).replace('d’', ' ')
 sentences = sentences.lower()
 
 #suppression de mots de 2 lettres ou moins
+tab = []
 tab = sentences.split()
 for i in tab:
     if len(i) < 3:
@@ -68,19 +65,19 @@ print('Model built')
 
 #Récupération du Cold Start Candidate
 entree = input("Entrez votre métier: ")
-
+entree = entree.lower()
+arr = []
 for i in entree:
     # vérifier que ces mots sont dans le vocabulaire
-    if i in model.vocab:                                            
-        print("Bonjour, j'ai cru comprendre que vous êtes", entree)
-        #moyenne des vecteurs
-else:
-    print('Le métier que vous avez renseigné n est pas valide, merci de renseigner une profession VALIDE')
-
+    if i in model.vocab:
+        arr.append((i, model[i]))
+    else:
+        print('Le métier que vous avez renseigné n est pas valide, merci de renseigner une profession VALIDE')
+print("Bonjour, j'ai cru comprendre que vous êtes", entree)
 
 
 #Placement du candidate dans nos clusters
-print(model.wv.most_similar(positive=job, topn=3))
+print(model.wv.most_similar(positive=entree, topn=3))
 
 
 
