@@ -1,15 +1,19 @@
 import pickle
 import string
-
 import nltk
 import pandas as pd
 import pymysql as sql
+
+from string import digits
 from gensim.models import KeyedVectors
 from sklearn.cluster import DBSCAN
+from nltk import word_tokenize, WordNetLemmatizer
+from nltk.corpus import stopwords
 
 nltk.download('punkt')
+nltk.download('stopwords')
 nltk.download('averaged_perceptron_tagger')
-from string import digits
+
 
 vec = []
 
@@ -64,21 +68,52 @@ print('Model built')
 
 
 ##################################################################################################
+##################################################################################################
+
+lemmatizer = WordNetLemmatizer()
 
 #Récupération du Cold Start Candidate
 entree = input("Entrez votre métier: ")
 entree = entree.lower()
-for i in entree:
-    # vérifier que ces mots sont dans le vocabulaire
-    if i in model.vocab:
-        vec.append((i, model[i]))
-    else:
-        print('Le métier que vous avez renseigné n est pas valide, merci de renseigner une profession VALIDE')
 print("Bonjour, j'ai cru comprendre que vous êtes", entree)
+
+if entree in model.vocab:
+    vec.append((entree, model[entree]))
+else:    #si pas dans le vocabulaire
+
+#découpe la chaine de caractère (tokenize)
+    tokenized_entree = word_tokenize(entree)
+    print(tokenized_entree)
+
+#supprime les caractères
+    no_caract_entree = []
+    for word in tokenized_entree:
+        if word not in string.punctuation:
+            no_caract_entree.append(word)
+    print(no_caract_entree)
+
+#supprime les stopword
+    stoplist = set(stopwords.words('french'))
+    int_no_stopwords = []
+    for word in no_caract_entree:
+        if word not in stoplist:
+            int_no_stopwords.append(word)
+
+#ramène les mots à leur racine (lemmatize)
+    lemmatized_entree = []
+    for word in int_no_stopwords:
+        lemmatized_entree.append(lemmatizer.lemmatize(word))
+    print(lemmatized_entree)
+
+#on trouve une solution pour les mots inconnus
+
+#sinon on les supprime
+
+#faire la moyenne des vecteurs
 
 
 #Placement du candidate dans nos clusters
-print(model.wv.most_similar(positive=entree, topn=3))
+
 
 
 
@@ -98,7 +133,7 @@ vectors = fillveccluster(tokens)
 dbVec = [v[1] for v in vectors]
 
 cluster = DBSCAN(eps=0.5, min_samples=1, metric='cosine').fit(dbVec)
-
+#                                                                                                             grosse valeur de epsilon (mail yue)
 print(cluster.labels_)
 
 ###################################################################################################
