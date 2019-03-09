@@ -3,10 +3,13 @@ import string
 import nltk
 import pandas as pd
 import pymysql as sql
+import numpy as np
+import matplotlib.pyplot as plt
 
 from string import digits
 from gensim.models import KeyedVectors
 from sklearn.cluster import DBSCAN
+from wordcloud import WordCloud
 from nltk import word_tokenize, WordNetLemmatizer
 from nltk.corpus import stopwords
 
@@ -59,7 +62,7 @@ tagged = nltk.pos_tag(tokens)
 print(tagged[0:6])
 
 
-###################################################################################################
+##################################################################################################
 
 vectors = pickle.load(open('foo','rb'))
 model = KeyedVectors.load_word2vec_format('testvec')
@@ -69,7 +72,7 @@ print('Model built')
 
 ##################################################################################################
 ##################################################################################################
-
+"""
 lemmatizer = WordNetLemmatizer()
 
 #Récupération du Cold Start Candidate
@@ -105,7 +108,8 @@ else:    #si pas dans le vocabulaire
         lemmatized_entree.append(lemmatizer.lemmatize(word))
     print(lemmatized_entree)
 
-#on trouve une solution pour les mots inconnus
+"""
+#on trouve une solution pour les mots inconnus (et avec /)
 
 #sinon on les supprime
 
@@ -119,7 +123,8 @@ else:    #si pas dans le vocabulaire
 
 #Renvoyer les termes les plus proches de notre candidat
 
-###################################################################################################
+
+##################################################################################################
 
 def fillveccluster(namelist):
     for a in namelist:
@@ -132,11 +137,11 @@ vectors = fillveccluster(tokens)
 
 dbVec = [v[1] for v in vectors]
 
-cluster = DBSCAN(eps=0.5, min_samples=1, metric='cosine').fit(dbVec)
-#                                                                                                             grosse valeur de epsilon (mail yue)
+cluster = DBSCAN(eps=0.162, min_samples=2, metric='cosine').fit(dbVec)
 print(cluster.labels_)
 
-###################################################################################################
+##################################################################################################
+
 
 #compter nombre de clusters
 count = 0
@@ -156,20 +161,30 @@ percent = 100 - round(num_out/tot * 100, 2)
 print('Le pourcentage de mots clusterisés est de :', percent, '%')
 
 
-###############################################################################################################
-###############################################################################################################
-
-# PLOTTING OUR WORDS TO SEE REPARTITION
+##################################################################################################
 """
+#WordCloud
+
+wordcloud = WordCloud(max_font_size=50, max_words=100, background_color="white").generate(chaine)
+plt.figure()
+plt.imshow(wordcloud, interpolation="bilinear")
+plt.axis("off")
+plt.show()
+"""
+
+##################################################################################################
+##################################################################################################
+"""
+# PLOTTING OUR WORDS TO SEE REPARTITION
+
 from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 from sklearn.datasets.samples_generator import make_blobs
-import matplotlib.pyplot as plt
-import numpy as np
+
 
 # Generate sample data
 #centers = [[1, 1], [-1, -1], [1, -1]]
-X, labels_true = make_blobs(n_samples= tot, random_state=0)
+X, labels_true = make_blobs(n_samples=tot, random_state=0)
 X = StandardScaler().fit_transform(X)
 
 # Compute DBSCAN
@@ -216,9 +231,19 @@ for k, col in zip(unique_labels, colors):
 
 plt.title('Estimated number of clusters: %d' % n_clusters_)
 plt.show()
-"""
 
-############################################################################################
+##################################################################################################
+#CALCULATING MOST APPROPRIATE VALUE OF EPSILON
+
+from yellowbrick.cluster import KElbowVisualizer
+from sklearn.cluster import KMeans
+
+mod = KMeans()
+visualizer = KElbowVisualizer(mod, k=(1, 10))
+visualizer.fit(X)
+visualizer.poof()
+"""
+##################################################################################################
 
 #Performing PCA
 """
@@ -235,6 +260,6 @@ print(pca.explained_variance_ratio_)
 print(pca.explained_variance_ratio_.sum())
 """
 
-#############################################################################################
+##################################################################################################
 
 
