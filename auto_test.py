@@ -112,7 +112,7 @@ else:    #si pas dans le vocabulaire
 
 
 #on trouve une solution pour les mots inconnus (et avec /)
-    ortho = lemmatized_entree.to_string()
+    ortho = "".join(lemmatized_entree)
     correct = spell(ortho)
     print(correct)
 #sinon on les supprime
