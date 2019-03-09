@@ -12,6 +12,7 @@ from sklearn.cluster import DBSCAN
 from wordcloud import WordCloud
 from nltk import word_tokenize, WordNetLemmatizer
 from nltk.corpus import stopwords
+from autocorrect import spell
 
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -72,7 +73,7 @@ print('Model built')
 
 ##################################################################################################
 ##################################################################################################
-"""
+
 lemmatizer = WordNetLemmatizer()
 
 #Récupération du Cold Start Candidate
@@ -85,6 +86,7 @@ if entree in model.vocab:
 else:    #si pas dans le vocabulaire
 
 #découpe la chaine de caractère (tokenize)
+    entree = entree.replace('-', ' ').replace('/', ' ')
     tokenized_entree = word_tokenize(entree)
     print(tokenized_entree)
 
@@ -108,9 +110,11 @@ else:    #si pas dans le vocabulaire
         lemmatized_entree.append(lemmatizer.lemmatize(word))
     print(lemmatized_entree)
 
-"""
-#on trouve une solution pour les mots inconnus (et avec /)
 
+#on trouve une solution pour les mots inconnus (et avec /)
+    ortho = lemmatized_entree.to_string()
+    correct = spell(ortho)
+    print(correct)
 #sinon on les supprime
 
 #faire la moyenne des vecteurs
