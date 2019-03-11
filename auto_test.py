@@ -127,7 +127,7 @@ else:    #si pas dans le vocabulaire
         print('Veuillez ré-essayer avec une orthographe correcte')
 
 #affichage des vecteurs du candidat
-    cold_start = fillveccluster(lemmatized_entree)
+    cold_start = fillveccluster(lemmatized_str)
     print(cold_start)
 
 #faire la moyenne des vecteurs
