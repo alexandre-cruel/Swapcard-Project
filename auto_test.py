@@ -2,6 +2,7 @@ import pickle
 import string
 import nltk
 import time
+import sys
 import pandas as pd
 import pymysql as sql
 import numpy as np
@@ -124,14 +125,17 @@ else:    #si pas dans le vocabulaire
 
 #sinon on les supprime
     if lemmatized_str not in model.vocab:
-        print('Veuillez ré-essayer avec une orthographe correcte')
+        sys.exit('Veuillez ré-essayer avec une orthographe correcte')
+
+
+
 
 #affichage des vecteurs du candidat
     cold_start = fillveccluster(lemmatized_str)
     print(cold_start)
 
 #faire la moyenne des vecteurs
-    dist = KeyedVectors.distance(cold_start)
+    dist = KeyedVectors.distance()
     print(dist)
 
 #Placement du candidate dans nos clusters
