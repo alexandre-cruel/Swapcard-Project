@@ -123,19 +123,17 @@ else:    #si pas dans le vocabulaire
 
     lemmatized_str = " ".join(lemmatized_entree)
 
-#sinon on les supprime
-    if lemmatized_str not in model.vocab:
-        sys.exit('Veuillez ré-essayer avec une orthographe correcte')
-
+    for lemmatized_str in model.vocab:
+        cold_start = fillveccluster(lemmatized_str)
+        print(cold_start)
 
 
 
 #affichage des vecteurs du candidat
-    cold_start = fillveccluster(lemmatized_str)
-    print(cold_start)
+
 
 #faire la moyenne des vecteurs
-    dist = KeyedVectors.distance()
+    dist = KeyedVectors.distance(cold_start[1], cold_start[2])                                      #pb car capte pas les deux distances à calculer
     print(dist)
 
 #Placement du candidate dans nos clusters
