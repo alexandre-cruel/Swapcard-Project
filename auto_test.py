@@ -1,6 +1,7 @@
 import pickle
 import string
 import nltk
+import time
 import pandas as pd
 import pymysql as sql
 import numpy as np
@@ -74,12 +75,21 @@ print('Model built')
 ##################################################################################################
 ##################################################################################################
 
+def fillveccluster(namelist):
+    for a in namelist:
+        if a in model.vocab:
+            vec.append((a, model[a]))
+    return vec
+
+##################################################################################################
+
 lemmatizer = WordNetLemmatizer()
 
 #Récupération du Cold Start Candidate
 entree = input("Entrez votre métier: ")
+start_time = time.time()
 entree = entree.lower()
-print("Bonjour, j'ai cru comprendre que vous êtes", entree)
+print("Bonjour, je crois comprendre que vous êtes", entree)
 
 if entree in model.vocab:
     vec.append((entree, model[entree]))
@@ -110,15 +120,19 @@ else:    #si pas dans le vocabulaire
         lemmatized_entree.append(lemmatizer.lemmatize(word))
     print(lemmatized_entree)
 
+    lemmatized_str = " ".join(lemmatized_entree)
 
-#on trouve une solution pour les mots inconnus (et avec /)
-    ortho = "".join(lemmatized_entree)
-    correct = spell(ortho)
-    print(correct)
 #sinon on les supprime
+    if lemmatized_str not in model.vocab:
+        print('Veuillez ré-essayer avec une orthographe correcte')
+
+#affichage des vecteurs du candidat
+    cold_start = fillveccluster(lemmatized_entree)
+    print(cold_start)
 
 #faire la moyenne des vecteurs
-
+    dist = KeyedVectors.distance(cold_start)
+    print(dist)
 
 #Placement du candidate dans nos clusters
 
@@ -129,12 +143,6 @@ else:    #si pas dans le vocabulaire
 
 
 ##################################################################################################
-
-def fillveccluster(namelist):
-    for a in namelist:
-        if a in model.vocab:
-            vec.append((a, model[a]))
-    return vec
 
 vectors = fillveccluster(tokens)
 #pickle.dump(vectors,open('foo','wb'))
@@ -267,3 +275,4 @@ print(pca.explained_variance_ratio_.sum())
 ##################################################################################################
 
 
+print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
