@@ -22,6 +22,7 @@ nltk.download('averaged_perceptron_tagger')
 
 
 vec = []
+lemmatizer = WordNetLemmatizer()
 
 #connect to sql db
 db_connection = sql.connect(host='localhost', database='swapcard', user='root', password='coucou74')
@@ -84,61 +85,62 @@ def fillveccluster(namelist):
 
 ##################################################################################################
 
-lemmatizer = WordNetLemmatizer()
+def cleaner(entree):
+    print("Bonjour, je crois comprendre que vous êtes", entree)
+    entree = entree.lower()
 
-#Récupération du Cold Start Candidate
-entree = input("Entrez votre métier: ")
-start_time = time.time()
-entree = entree.lower()
-print("Bonjour, je crois comprendre que vous êtes", entree)
-
-if entree in model.vocab:
-    vec.append((entree, model[entree]))
-else:    #si pas dans le vocabulaire
-
-#découpe la chaine de caractère (tokenize)
+# découpe la chaine de caractère (tokenize)
     entree = entree.replace('-', ' ').replace('/', ' ')
     tokenized_entree = word_tokenize(entree)
     print(tokenized_entree)
 
-#supprime les caractères
+# supprime les caractères
     no_caract_entree = []
     for word in tokenized_entree:
         if word not in string.punctuation:
             no_caract_entree.append(word)
     print(no_caract_entree)
 
-#supprime les stopword
+# supprime les stopword
     stoplist = set(stopwords.words('french'))
     int_no_stopwords = []
     for word in no_caract_entree:
         if word not in stoplist:
             int_no_stopwords.append(word)
 
-#ramène les mots à leur racine (lemmatize)
+# ramène les mots à leur racine (lemmatize)
     lemmatized_entree = []
     for word in int_no_stopwords:
         lemmatized_entree.append(lemmatizer.lemmatize(word))
     print(lemmatized_entree)
 
+
+#Stoppe le programme si mauvaise orthographe
     lemmatized_str = " ".join(lemmatized_entree)
+    if lemmatized_str not in model.vocab:
+        return exit("Merci de ré-essayer avec une orthographe correcte")
+    else:
+        vec.append((lemmatized_str, model[lemmatized_str]))
+        print(vec)
 
-    for lemmatized_str in model.vocab:
-        cold_start = fillveccluster(lemmatized_str)
-        print(cold_start)
+##################################################################################################
 
 
+
+#Récupération du Cold Start Candidate
+entree = input("Entrez votre métier: ")
+start_time = time.time()
+
+cleaner(entree)
 
 #affichage des vecteurs du candidat
 
 
 #faire la moyenne des vecteurs
-    dist = KeyedVectors.distance(cold_start[1], cold_start[2])                                      #pb car capte pas les deux distances à calculer
-    print(dist)
+#dist = KeyedVectors.distance(cold_start[1], cold_start[2])                                      #pb car capte pas les deux distances à calculer
+#print(dist)
 
 #Placement du candidate dans nos clusters
-
-
 
 
 #Renvoyer les termes les plus proches de notre candidat
@@ -151,7 +153,7 @@ vectors = fillveccluster(tokens)
 
 dbVec = [v[1] for v in vectors]
 
-cluster = DBSCAN(eps=0.162, min_samples=2, metric='cosine').fit(dbVec)
+cluster = DBSCAN(eps=0 .162,min_samples=2, metric='cosine').fit(dbVec)
 print(cluster.labels_)
 
 ##################################################################################################
