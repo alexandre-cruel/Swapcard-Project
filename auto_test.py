@@ -115,11 +115,21 @@ def cleaner(entree):
     print(lemmatized_entree)
 
 
+
 #Stoppe le programme si mauvaise orthographe
+
     lemmatized_str = " ".join(lemmatized_entree)
+
+    hey = model.most_similar(lemmatized_str, topn=1)
+    print('-------------------', hey)
+
+
+
     if lemmatized_str not in model.vocab:
         return exit("Merci de ré-essayer avec une orthographe correcte")
     else:
+#Affichage des vecteurs du candidat
+
         vec.append((lemmatized_str, model[lemmatized_str]))
         print(vec)
 
@@ -130,17 +140,13 @@ def cleaner(entree):
 #Récupération du Cold Start Candidate
 entree = input("Entrez votre métier: ")
 start_time = time.time()
-
+#Nettoyage de la réponse entrée
 cleaner(entree)
 
-#affichage des vecteurs du candidat
-
-
 #faire la moyenne des vecteurs
-#dist = KeyedVectors.distance(cold_start[1], cold_start[2])                                      #pb car capte pas les deux distances à calculer
+#dist = KeyedVectors.distance(vec[1], vec[2])                                      #pb car capte pas les deux distances à calculer
 #print(dist)
 
-#Placement du candidate dans nos clusters
 
 
 #Renvoyer les termes les plus proches de notre candidat
@@ -153,7 +159,7 @@ vectors = fillveccluster(tokens)
 
 dbVec = [v[1] for v in vectors]
 
-cluster = DBSCAN(eps=0 .162,min_samples=2, metric='cosine').fit(dbVec)
+cluster = DBSCAN(eps=0.162, min_samples=2, metric='cosine').fit(dbVec)           #pb car ne trouve pas notre mot
 print(cluster.labels_)
 
 ##################################################################################################
