@@ -14,12 +14,11 @@ from sklearn.cluster import DBSCAN
 from wordcloud import WordCloud
 from nltk import word_tokenize, WordNetLemmatizer
 from nltk.corpus import stopwords
-from autocorrect import spell
+from distance import levenshtein
 
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('averaged_perceptron_tagger')
-
 
 vec = []
 lemmatizer = WordNetLemmatizer()
@@ -113,25 +112,23 @@ def cleaner(entree):
     for word in int_no_stopwords:
         lemmatized_entree.append(lemmatizer.lemmatize(word))
     print(lemmatized_entree)
-
-
-
-#Stoppe le programme si mauvaise orthographe
-
     lemmatized_str = " ".join(lemmatized_entree)
 
-    hey = model.most_similar(lemmatized_str, topn=1)
-    print('-------------------', hey)
 
-
+    metier = pd.read_csv('job.csv', sep='\t', low_memory=False)
 
     if lemmatized_str not in model.vocab:
-        return exit("Merci de ré-essayer avec une orthographe correcte")
-    else:
+        for x in metier:
+            print(levenshtein(lemmatized_str, x))
+            #trouver la distance minimum et la print
+
+
+    #if lemmatized_str not in model.vocab:
+        #return exit("Merci de ré-essayer avec une orthographe correcte")
 #Affichage des vecteurs du candidat
 
-        vec.append((lemmatized_str, model[lemmatized_str]))
-        print(vec)
+        #vec.append((lemmatized_str, model[lemmatized_str]))
+        #print(vec)
 
 ##################################################################################################
 
