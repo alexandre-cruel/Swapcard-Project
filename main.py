@@ -1,49 +1,290 @@
-import matplotlib
+import pickle
+import string
+import nltk
+import time
+import sys
 import pandas as pd
 import pymysql as sql
+import numpy as np
 import matplotlib.pyplot as plt
-import sklearn as skt
 
-plt.figure(figsize=(40,40))
+from string import digits
+from gensim.models import KeyedVectors
+from sklearn.cluster import DBSCAN
+from wordcloud import WordCloud
+from nltk import word_tokenize, WordNetLemmatizer
+from nltk.corpus import stopwords
+from distance import levenshtein
 
-font = {'family' : 'normal',
-        'weight' : 'bold',
-        'size'   : 40}
+response = ''
 
-matplotlib.rc('font', **font)
 
-db_connection = sql.connect(host='localhost', database='swap_card', user='root', password='password')
+def recommendation(args1):
+    global response
 
-#dfJobTtl = pd.read_sql("select * from user where job_title is not NULL and not tags='[]' and not companies='[]'", con=db_connection)
+    nltk.download('punkt')
+    nltk.download('stopwords')
+    nltk.download('averaged_perceptron_tagger')
+    nltk.download('wordnet')
 
-dfJobTtl = pd.read_sql("select job_title from user where not tags='[]' and not companies='[]'", con=db_connection)
+    vec = []
+    lemmatizer = WordNetLemmatizer()
 
-#dfJobTtl = dfJobTtl.drop(['educations', 'second_job_title'], axis=1)
+    # connect to sql db
+    db_connection = sql.connect(host='localhost', database='swapcard', user='root', password='coucou74')
 
-dfJobTtl = dfJobTtl.replace(["Dirigeant","Futur Dirigeant","CEO","Président","Directeur Général","Directeur"], "Poste de direction")
+    # create dataframe from our db
+    dfJobTtl = pd.read_sql(
+        "select job_title from user where not tags='[]' and not companies='[]' group by job_title order by count(*) desc limit 100",
+        con=db_connection)
+    dfJobTtl = dfJobTtl.loc[2:]
+    print(dfJobTtl.head())
 
-dfJobTtl = dfJobTtl.replace(["PDG, DG","Gérant","PDG / Gérant / Directeur général","Chef d'entreprise","CEO/Managing Director","Co-Founder"], "Poste de direction")
+    # take our job title into a string
+    text = dfJobTtl.to_string()
 
-dfJobTtl = dfJobTtl.replace(["Autre","Autres","Other","","-"], "Autre")
+    # removing the digits from the list
+    remove_digits = str.maketrans('', '', digits)
+    text2 = text.translate(remove_digits)
+    print(text2)
 
-# dfJobTtl = dfJobTtl.replace(["Etudiant","Student"], 2)
+    # removing characters
+    table = str.maketrans({key: ' ' for key in string.punctuation})
+    sentences = text2.translate(table).replace('d’', ' ')
 
-dfJobTtl = dfJobTtl.replace(['Law, Economics, Management'], "Law/Eco/management")
+    # convert string to lowercase
+    sentences = sentences.lower()
 
-dfJobTtl = dfJobTtl.replace(["Engineering & Technology","Technical/Engineering","Data Scientist"],"Ingé")
+    # suppression de mots de 2 lettres ou moins
+    tab = []
+    tab = sentences.split()
+    for i in tab:
+        if len(i) < 3:
+            tab.remove(i)
+    print(tab)
+    chaine = " ".join(tab)
 
-dfJobTtl = dfJobTtl.replace(["Marketing", "Marketing/Communication"],"Marketing")
+    # use of nltk
+    tokens = nltk.word_tokenize(chaine)
+    print(tokens)
+    tagged = nltk.pos_tag(tokens)
+    print(tagged[0:6])
 
-dfJobTtl = dfJobTtl.replace(["Sales", "Sales/Business Development", "Vendeur (commerce de détail)", "Acheteur"],"Acheteurs")
+    ##################################################################################################
 
-orderedJobTitles = dfJobTtl.job_title.value_counts(dropna=True)
+    vectors = pickle.load(open('foo', 'rb'))
+    model = KeyedVectors.load_word2vec_format('testvec')
 
-for x in range(0,len(orderedJobTitles)):
-    if orderedJobTitles[x] <= 5000:
-        orderedJobTitles[x] = 0
+    print('Model built')
 
-orderedJobTitles.plot(kind='bar')
+    ##################################################################################################
+    ##################################################################################################
 
+    def fillveccluster(namelist):
+        for a in namelist:
+            if a in model.vocab:
+                vec.append((a, model[a]))
+        return vec
+
+    ##################################################################################################
+
+    def cleaner(entree):
+        global response
+        response = response + 'Bonjour, je crois comprendre que vous êtes ' + entree
+        print("Bonjour, je crois comprendre que vous êtes", entree)
+        entree = entree.lower()
+
+        # découpe la chaine de caractère (tokenize)
+        entree = entree.replace('-', ' ').replace('/', ' ')
+        tokenized_entree = word_tokenize(entree)
+        print(tokenized_entree)
+
+        no_caract_entree = []
+        for word in tokenized_entree:
+            if word not in string.punctuation:
+                no_caract_entree.append(word)
+        print(no_caract_entree)
+
+        # supprime les stopword
+        stoplist = set(stopwords.words('french'))
+        int_no_stopwords = []
+        for word in no_caract_entree:
+            if word not in stoplist:
+                int_no_stopwords.append(word)
+        # ramène les mots à leur racine (lemmatize)
+        lemmatized_entree = []
+        for word in int_no_stopwords:
+            lemmatized_entree.append(lemmatizer.lemmatize(word))
+        print(lemmatized_entree)
+
+        # Stoppe le programme si mauvaise orthographe
+        lemmatized_str = " ".join(lemmatized_entree)
+        if lemmatized_str not in model.vocab:
+            return exit("Merci de ré-essayer avec une orthographe correcte")
+        else:
+            vec.append((lemmatized_str, model[lemmatized_str]))
+            print(vec)
+
+    ##################################################################################################
+
+    # Récupération du Cold Start Candidate
+    # entree = input("Entrez votre métier: ")
+
+    start_time = time.time()
+
+    cleaner(args1)
+
+    # faire la moyenne des vecteurs
+    # dist = KeyedVectors.distance(cold_start[1], cold_start[2])
+    # #pb car capte pas les deux distances à calculer
+    # print(dist)
+
+    # Placement du candidate dans nos clusters
+
+    # Renvoyer les termes les plus proches de notre candidat
+
+    ##################################################################################################
+    dbVec = [v[1] for v in vectors]
+
+    cluster = DBSCAN(eps=0.162, min_samples=2, metric='cosine').fit(dbVec)
+    print(cluster.labels_)
+
+    ##################################################################################################
+
+    # compter nombre de clusters
+    count = 0
+    for i in range(min(cluster.labels_), max(cluster.labels_)):
+        nbr = max(cluster.labels_) + 1
+    response = response + '\non a ' + str(nbr) + ' clusteurs !'
+    print('On a ', nbr, 'clusters !')
+
+    # compter nombre de mots clusterisés
+    num_out = (cluster.labels_ == -1).sum()
+    tot = 0
+    for i in cluster.labels_:
+        tot = tot + 1
+    response = response + 'On a ' + str(tot) + ' mots dans notre liste de métiers\n' + str(num_out) + 'ne sont pas ' \
+                                                                                                      'compris dans ' \
+                                                                                                      'un clusteur '
+    print('On a ', tot, 'mots dans notre liste de métiers')
+    print(num_out, 'ne sont pas compris dans un cluster')
+
+    percent = 100 - round(num_out / tot * 100, 2)
+    print('Le pourcentage de mots clusterisés est de :', percent, '%')
+    response = response + '\nLe pourcentage de mots clusterisés est de : ' + str(percent) + '%'
+
+    return response
+
+
+def main(argv):
+    print('ok')
+
+
+if __name__ == "__main__":
+    import sys
+
+    main(sys.argv)
+
+##################################################################################################
+"""
+#WordCloud
+
+wordcloud = WordCloud(max_font_size=50, max_words=100, background_color="white").generate(chaine)
+plt.figure()
+plt.imshow(wordcloud, interpolation="bilinear")
+plt.axis("off")
+plt.show()
+"""
+
+##################################################################################################
+##################################################################################################
+"""
+# PLOTTING OUR WORDS TO SEE REPARTITION
+
+from sklearn import metrics
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets.samples_generator import make_blobs
+
+
+# Generate sample data
+#centers = [[1, 1], [-1, -1], [1, -1]]
+X, labels_true = make_blobs(n_samples=tot, random_state=0)
+X = StandardScaler().fit_transform(X)
+
+# Compute DBSCAN
+core_samples_mask = np.zeros_like(cluster.labels_, dtype=bool)
+core_samples_mask[cluster.core_sample_indices_] = True
+labels = cluster.labels_
+
+# Number of clusters in labels, ignoring noise if present.
+n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+n_noise_ = list(labels).count(-1)
+
+print('Estimated number of clusters: %d' % n_clusters_)
+print('Estimated number of noise points: %d' % n_noise_)
+print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels))
+print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels))
+print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels))
+print("Adjusted Rand Index: %0.3f"
+      % metrics.adjusted_rand_score(labels_true, labels))
+print("Adjusted Mutual Information: %0.3f"
+      % metrics.adjusted_mutual_info_score(labels_true, labels))
+print("Silhouette Coefficient: %0.3f"
+      % metrics.silhouette_score(X, labels))
+
+# Plot result
+
+# Black removed and is used for noise instead.
+unique_labels = set(labels)
+colors = [plt.cm.Spectral(each)
+          for each in np.linspace(0, 1, len(unique_labels))]
+for k, col in zip(unique_labels, colors):
+    if k == -1:
+        # Black used for noise.
+        col = [0, 0, 0, 1]
+
+    class_member_mask = (labels == k)
+
+    xy = X[class_member_mask & core_samples_mask]
+    plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),   # 'o' : marker en forme de cercle
+             markeredgecolor='k', markersize=14)
+
+    xy = X[class_member_mask & ~core_samples_mask]
+    plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),
+             markeredgecolor='k', markersize=6)
+
+plt.title('Estimated number of clusters: %d' % n_clusters_)
 plt.show()
 
+##################################################################################################
+#CALCULATING MOST APPROPRIATE VALUE OF EPSILON
 
+from yellowbrick.cluster import KElbowVisualizer
+from sklearn.cluster import KMeans
+
+mod = KMeans()
+visualizer = KElbowVisualizer(mod, k=(1, 10))
+visualizer.fit(X)
+visualizer.poof()
+"""
+##################################################################################################
+
+# Performing PCA
+"""
+from sklearn import decomposition
+from sklearn import preprocessing
+
+std_scale = preprocessing.StandardScaler().fit(X)
+X_scaled = std_scale.transform(X)
+pca = decomposition.PCA(n_components=2)
+pca.fit(X_scaled)
+
+print(pca.n_components_)
+print(pca.explained_variance_ratio_)
+print(pca.explained_variance_ratio_.sum())
+"""
+
+##################################################################################################
+
+
+# print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))

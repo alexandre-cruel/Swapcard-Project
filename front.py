@@ -1,5 +1,5 @@
 from tkinter import *
-import auto_test
+import main
 
 
 def Affichage_Profil1():
@@ -41,27 +41,27 @@ def Affichage_Profil6():
 def Recommand():
     if recom == 1:
         Texte_retour.set('Recommandation en cours, veuillez patienter ...')
-        reponse = auto_test.recommendation('Ingénieur')
+        reponse = main.recommendation('Ingénieur')
         Texte_retour.set('la recommandation du profil 1 est \n' + reponse)
     elif recom == 2:
         Texte_retour.set('Recommandation en cours, veuillez patienter ...')
-        reponse = auto_test.recommendation('Cadre')
+        reponse = main.recommendation('Cadre')
         Texte_retour.set('la recommandation du profil 2 est \n' + reponse)
     elif recom == 3:
         Texte_retour.set('Recommandation en cours, veuillez patienter ...')
-        reponse = auto_test.recommendation('Développeur')
+        reponse = main.recommendation('Développeur')
         Texte_retour.set('la recommandation du profil 3 est \n' + reponse)
     elif recom == 4:
         Texte_retour.set('Recommandation en cours, veuillez patienter ...')
-        reponse = auto_test.recommendation('RH')
+        reponse = main.recommendation('RH')
         Texte_retour.set('la recommandation du profil 4 est \n' + reponse)
     elif recom == 5:
         Texte_retour.set('Recommandation en cours, veuillez patienter ...')
-        reponse = auto_test.recommendation('CTO')
+        reponse = main.recommendation('CTO')
         Texte_retour.set('la recommandation du profil 5 est \n' + reponse)
     elif recom == 6:
         Texte_retour.set('Recommandation en cours, veuillez patienter ...')
-        reponse = auto_test.recommendation('CEO')
+        reponse = main.recommendation('CEO')
         Texte_retour.set('la recommandation du profil 6 est \n' + reponse)
 
 
