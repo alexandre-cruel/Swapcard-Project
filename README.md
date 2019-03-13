@@ -1,28 +1,31 @@
-# Swapcard-Project : Projet Data-Science Master2 Esme Sudria
+# Swapcard-Project : Data Science project for ESME Sudria Master2
+![alt text](https://www.esme.fr/Content/images/design/logo_esme.png)
+![alt text](https://www.swapcard.com/static/LogoFINAL-8700cd1c4ccb0b24abfdaf26e5b67b4f.svg)
 
-Système de recommandation de profil de personnes à rencontrer lors d'événements.
+Recommendation system for profiling people to meet at events.
 
 ## Description : 
 
-Nous avons pour objectif de créer un système de recommandation pour des utilisateurs sur lesquels nous avons très peu de données. 
+Our objective is to create a recommendation system to resolve a cold start problem with new users with minimal informations.
 
-Vous retrouverez dans ce projet : 
-
-### Identification des profils 
-- _w2v.py_ : Génère de faux cluster basé sur le modèle word2vec de Google News
-- _dbScanClustering.py_ : Utilise la bibliothèque DBScan de Scikit-Learn pour créer automatiquement les cluster à partir des vecteurs du modèle GN
+### Profiles identification
+- _w2v.py_ : Generate fake clusters based on the GoogleNews' Word2Vec model.
+- _dbScanClustering.py_ : Use Scikit-Learn DBScan to create automatic clusters from vectors in the GoogleNews model.
 ### Recommandation
-- _main.py_ : Récupération des profils complets dans la base de donnée puis _parsing_ partiel des données (*Work in progress*)
+- _main.py_ : Gather completes profiles informations from our  database, then  partial _parsing_ of datas.(*Work in progress*)
 
-
-## Télécharger le projet
+## Download the project
 ```bash
 git clone https://github.com/alexandre-cruel/Swapcard-Project 
 ```
+## Run the project
+You need to install the modules requires in the project.
 
-## Dev team :  
-* Baptiste Chevallier  
-* Raphaël Champeaud  
-* Alexandre Cruel  
+Then run the **front.py**
 
+## Contributing : 
+• **[Raphaël Champeaud](https://github.com/RaphCPV)**
 
+• **[Baptiste Chevallier](https://github.com/baptchv/)**
+
+• **[Alexandre Cruel](https://github.com/alexandre-cruel)** 
