@@ -21,9 +21,6 @@ response = ''
 def recommendation(args1):
     global response
     
-    
-vec = []
-lemmatizer = WordNetLemmatizer()
 
     nltk.download('punkt')
     nltk.download('stopwords')
@@ -105,28 +102,26 @@ lemmatizer = WordNetLemmatizer()
         tokenized_entree = word_tokenize(entree)
         print(tokenized_entree)
 
-# ramène les mots à leur racine (lemmatize)
-    lemmatized_entree = []
-    for word in int_no_stopwords:
-        lemmatized_entree.append(lemmatizer.lemmatize(word))
-    print(lemmatized_entree)
+        no_caract_entree = []
+        for word in tokenized_entree:
+            if word not in string.punctuation:
+                no_caract_entree.append(word)
+        print(no_caract_entree)
 
-    # supprime les stopword
+        # supprime les stopword
         stoplist = set(stopwords.words('french'))
         int_no_stopwords = []
         for word in no_caract_entree:
             if word not in stoplist:
+
                 int_no_stopwords.append(word)
+    # ramène les mots à leur racine (lemmatize)
+        lemmatized_entree = []
+        for word in int_no_stopwords:
+            lemmatized_entree.append(lemmatizer.lemmatize(word))
+        print(lemmatized_entree)
 
-#Stoppe le programme si mauvaise orthographe
-    lemmatized_str = " ".join(lemmatized_entree)
-    if lemmatized_str not in model.vocab:
-        return exit("Merci de ré-essayer avec une orthographe correcte")
-    else:
-        vec.append((lemmatized_str, model[lemmatized_str]))
-        print(vec)
 
-##################################################################################################
 
     #Stoppe le programme si mauvaise orthographe
         lemmatized_str = " ".join(lemmatized_entree)
@@ -141,15 +136,16 @@ lemmatizer = WordNetLemmatizer()
 #Récupération du Cold Start Candidate
 #entree = input("Entrez votre métier: ")
 
-start_time = time.time()
+    start_time = time.time()
 
 
 
-cleaner(args1)
+    cleaner(args1)
 
 
     #faire la moyenne des vecteurs
-    #dist = KeyedVectors.distance(cold_start[1], cold_start[2])                                      #pb car capte pas les deux distances à calculer
+    #dist = KeyedVectors.distance(cold_start[1], cold_start[2])
+    # #pb car capte pas les deux distances à calculer
     #print(dist)
 
     #Placement du candidate dans nos clusters
@@ -159,10 +155,6 @@ cleaner(args1)
 
 
     ##################################################################################################
-
-cluster = DBSCAN(eps=0 .162,min_samples=2, metric='cosine').fit(dbVec)
-print(cluster.labels_)
-
     dbVec = [v[1] for v in vectors]
 
     cluster = DBSCAN(eps=0.162,min_samples=2, metric='cosine').fit(dbVec)
