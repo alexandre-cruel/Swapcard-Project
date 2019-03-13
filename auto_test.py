@@ -2,7 +2,6 @@ import pickle
 import string
 import nltk
 import time
-import sys
 import pandas as pd
 import pymysql as sql
 import numpy as np
@@ -16,200 +15,186 @@ from nltk import word_tokenize, WordNetLemmatizer
 from nltk.corpus import stopwords
 from distance import levenshtein
 
-response = ''
-
-def recommendation(args1):
-    global response
-    
-
-    nltk.download('punkt')
-    nltk.download('stopwords')
-    nltk.download('averaged_perceptron_tagger')
-    nltk.download('wordnet')
-
-    vec = []
-    lemmatizer = WordNetLemmatizer()
-
-    #connect to sql db
-    db_connection = sql.connect(host='localhost', database='swapcard', user='root', password='coucou74')
-
-    #create dataframe from our db
-    dfJobTtl = pd.read_sql("select job_title from user where not tags='[]' and not companies='[]' group by job_title order by count(*) desc limit 100", con=db_connection)
-    dfJobTtl = dfJobTtl.loc[2:]
-    print(dfJobTtl.head())
 
 
-    #take our job title into a string
-    text = dfJobTtl.to_string()
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
 
-    #removing the digits from the list
-    remove_digits = str.maketrans('', '', digits)
-    text2 = text.translate(remove_digits)
-    print(text2)
+vec = []
+lemmatizer = WordNetLemmatizer()
 
+#connect to sql db
+db_connection = sql.connect(host='localhost', database='swapcard', user='root', password='coucou74')
 
-    #removing characters
-    table = str.maketrans({key: ' ' for key in string.punctuation})
-    sentences = text2.translate(table).replace('d’', ' ')
-
-
-    #convert string to lowercase
-    sentences = sentences.lower()
-
-    #suppression de mots de 2 lettres ou moins
-    tab = []
-    tab = sentences.split()
-    for i in tab:
-        if len(i) < 3:
-            tab.remove(i)
-    print(tab)
-    chaine = " ".join(tab)
-
-    #use of nltk
-    tokens = nltk.word_tokenize(chaine)
-    print(tokens)
-    tagged = nltk.pos_tag(tokens)
-    print(tagged[0:6])
+#create dataframe from our db
+dfJobTtl = pd.read_sql("select job_title from user where not tags='[]' and not companies='[]' group by job_title order by count(*) desc limit 100", con=db_connection)
+dfJobTtl = dfJobTtl.loc[2:]
+print(dfJobTtl.head())
 
 
-    ##################################################################################################
+#take our job title into a string
+text = dfJobTtl.to_string()
 
-    vectors = pickle.load(open('foo','rb'))
-    model = KeyedVectors.load_word2vec_format('testvec')
+#removing the digits from the list
+remove_digits = str.maketrans('', '', digits)
+text2 = text.translate(remove_digits)
+print(text2)
 
-    import winsound
-    frequency = 1500  # Set Frequency To 2500 Hertz
-    duration = 1000  # Set Duration To 1000 ms == 1 second
-    winsound.Beep(frequency, duration)
-
-    print('Model built')
+#removing characters
+table = str.maketrans({key: ' ' for key in string.punctuation})
+sentences = text2.translate(table).replace('d’', ' ')
 
 
-    ##################################################################################################
-    ##################################################################################################
+#convert string to lowercase
+sentences = sentences.lower()
 
-    def fillveccluster(namelist):
-        for a in namelist:
-            if a in model.vocab:
-                vec.append((a, model[a]))
-        return vec
+#suppression de mots de 2 lettres ou moins
+tab = []
+tab = sentences.split()
+for i in tab:
+    if len(i) < 3:
+        tab.remove(i)
+print(tab)
+chaine = " ".join(tab)
 
-    ##################################################################################################
+#use of nltk
+tokens = nltk.word_tokenize(chaine)
+print(tokens)
+tagged = nltk.pos_tag(tokens)
+print(tagged[0:6])
 
-    def cleaner(entree):
-        global response
-        response = response + 'Bonjour, je crois comprendre que vous êtes ' + entree
-        print("Bonjour, je crois comprendre que vous êtes", entree)
-        entree = entree.lower()
 
-    # découpe la chaine de caractère (tokenize)
-        entree = entree.replace('-', ' ').replace('/', ' ')
-        tokenized_entree = word_tokenize(entree)
-        print(tokenized_entree)
+##################################################################################################
 
-        no_caract_entree = []
-        for word in tokenized_entree:
-            if word not in string.punctuation:
-                no_caract_entree.append(word)
-        print(no_caract_entree)
+vectors = pickle.load(open('foo','rb'))
+model = KeyedVectors.load_word2vec_format('testvec')
+print('Model built')
 
-        # supprime les stopword
-        stoplist = set(stopwords.words('french'))
-        int_no_stopwords = []
-        for word in no_caract_entree:
-            if word not in stoplist:
-                int_no_stopwords.append(word)
+import winsound
+frequency = 1500  # Set Frequency To 2500 Hertz
+duration = 1000  # Set Duration To 1000 ms == 1 second
+winsound.Beep(frequency, duration)
 
-        # ramène les mots à leur racine (lemmatize)
-        lemmatized_entree = []
-        for word in int_no_stopwords:
-            lemmatized_entree.append(lemmatizer.lemmatize(word))
-        print(lemmatized_entree)
-        lemmatized_str = " ".join(lemmatized_entree)
 
-        metier = pd.read_csv('job.csv', sep='\t', low_memory=False)
-        liste_metier = metier['libellé métier']
-        for row in liste_metier:
-            print(row)
+##################################################################################################
+##################################################################################################
 
-        '''if lemmatized_str not in model.vocab:
-            for nom in metier['libellé métier']:
-                distance_lev = levenshtein(nom, lemmatized_str)
-                print(distance_lev)
-                # trouver la distance minimum et la print
-'''
-        # if lemmatized_str not in model.vocab:
-        # return exit("Merci de ré-essayer avec une orthographe correcte")
+def fillveccluster(namelist):
+    for a in namelist:
+        if a in model.vocab:
+            vec.append((a, model[a]))
+    return vec
 
-    # Affichage des vecteurs du candidat
+##################################################################################################
 
-    # vec.append((lemmatized_str, model[lemmatized_str]))
-    # print(vec)
+def cleaner(entree):
 
-    ##################################################################################################
+    print("Bonjour, je crois comprendre que vous êtes", entree)
+    entree = entree.lower()
+
+# découpe la chaine de caractère (tokenize)
+    entree = entree.replace('-', ' ').replace('/', ' ')
+    tokenized_entree = word_tokenize(entree)
+    print(tokenized_entree)
+
+    no_caract_entree = []
+    for word in tokenized_entree:
+        if word not in string.punctuation:
+            no_caract_entree.append(word)
+    print(no_caract_entree)
+
+# supprime les stopword
+    stoplist = set(stopwords.words('french'))
+    int_no_stopwords = []
+    for word in no_caract_entree:
+        if word not in stoplist:
+            int_no_stopwords.append(word)
+
+# ramène les mots à leur racine (lemmatize)
+    lemmatized_entree = []
+    for word in int_no_stopwords:
+        lemmatized_entree.append(lemmatizer.lemmatize(word))
+    print(lemmatized_entree)
+    lemmatized_str = " ".join(lemmatized_entree)
+
+    metier = pd.read_csv('jobs.csv', sep='\t', low_memory=False)
+    liste_metier = metier['libellé métier']
+
+
+# propose une correction de l'orthographe
+    if lemmatized_str not in model.vocab:
+        mini = 100
+        monmot = None
+
+        # trouver la distance minimum et la print
+        for nom in liste_metier:
+            distance_lev = levenshtein(nom, lemmatized_str)
+            if distance_lev < mini:
+                 monmot = nom
+            mini = min(mini, distance_lev)
+
+        print('Le terme dans le dictionnaire le plus proche du mot saisi est à une distance de:', mini)
+        print('TERME LE PLUS PROCHE', monmot)
+
+
+
+    if lemmatized_str not in model.vocab:
+        return exit("Merci de ré-essayer avec une orthographe correcte")
+
+# Affichage des vecteurs du candidat
+
+# vec.append((lemmatized_str, model[lemmatized_str]))
+# print(vec)
+
+##################################################################################################
 
 #Récupération du Cold Start Candidate
-    entree = input("Entrez votre métier: ")
-    start_time = time.time()
-    cleaner(entree)
+entree = input("Entrez votre métier: ")
+start_time = time.time()
+cleaner(entree)
 
 
-    #faire la moyenne des vecteurs
-    #dist = KeyedVectors.distance(cold_start[1], cold_start[2])
-    # #pb car capte pas les deux distances à calculer
-    #print(dist)
+#faire la moyenne des vecteurs
+#dist = KeyedVectors.distance(cold_start[1], cold_start[2])
+# #pb car capte pas les deux distances à calculer
+#print(dist)
 
-    #Placement du candidate dans nos clusters
-
-
-    #Renvoyer les termes les plus proches de notre candidat
+#Placement du candidate dans nos clusters
 
 
-    ##################################################################################################
-    dbVec = [v[1] for v in vectors]
-
-    cluster = DBSCAN(eps=0.162,min_samples=2, metric='cosine').fit(dbVec)
-    print(cluster.labels_)
-
-    ##################################################################################################
+#Renvoyer les termes les plus proches de notre candidat
 
 
-    #compter nombre de clusters
-    count = 0
-    for i in range(min(cluster.labels_), max(cluster.labels_)):
-        nbr = max(cluster.labels_) +1
-    response = response + '\non a ' + str(nbr) + ' clusteurs !'
-    print('On a ', nbr, 'clusters !')
+##################################################################################################
+dbVec = [v[1] for v in vectors]
 
-    #compter nombre de mots clusterisés
-    num_out = (cluster.labels_ == -1).sum()
-    tot = 0
-    for i in cluster.labels_:
-        tot = tot +1
-    response = response + 'On a ' + str(tot) + ' mots dans notre liste de métiers\n' + str(num_out) + 'ne sont pas ' \
-                                                                                                      'compris dans ' \
-                                                                                                      'un clusteur '
-    print('On a ', tot, 'mots dans notre liste de métiers')
-    print(num_out, 'ne sont pas compris dans un cluster')
+cluster = DBSCAN(eps=0.3, min_samples=2, metric='cosine').fit(dbVec)
+print(cluster.labels_)
 
-    percent = 100 - round(num_out/tot * 100, 2)
-    print('Le pourcentage de mots clusterisés est de :', percent, '%')
-    response = response + '\nLe pourcentage de mots clusterisés est de : ' + str(percent) +'%'
-
-    print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
-    return response
+##################################################################################################
 
 
+#compter nombre de clusters
+count = 0
+for i in range(min(cluster.labels_), max(cluster.labels_)):
+    nbr = max(cluster.labels_) +1
 
+print('On a ', nbr, 'clusters !')
 
+#compter nombre de mots clusterisés
+num_out = (cluster.labels_ == -1).sum()
+tot = 0
+for i in cluster.labels_:
+    tot = tot +1
 
-def main(argv):
-    recommendation('')
+print('On a ', tot, 'mots dans notre liste de métiers')
+print(num_out, 'ne sont pas compris dans un cluster')
 
+percent = 100 - round(num_out/tot * 100, 2)
+print('Le pourcentage de mots clusterisés est de :', percent, '%')
 
-if __name__ == "__main__":
-    import sys
-    main(sys.argv)
 
 ##################################################################################################
 """
@@ -311,3 +296,6 @@ print(pca.explained_variance_ratio_.sum())
 """
 
 ##################################################################################################
+
+
+print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
