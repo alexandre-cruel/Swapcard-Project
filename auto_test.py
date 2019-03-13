@@ -77,6 +77,11 @@ def recommendation(args1):
     vectors = pickle.load(open('foo','rb'))
     model = KeyedVectors.load_word2vec_format('testvec')
 
+    import winsound
+    frequency = 1500  # Set Frequency To 2500 Hertz
+    duration = 1000  # Set Duration To 1000 ms == 1 second
+    winsound.Beep(frequency, duration)
+
     print('Model built')
 
 
@@ -113,23 +118,33 @@ def recommendation(args1):
         int_no_stopwords = []
         for word in no_caract_entree:
             if word not in stoplist:
-
                 int_no_stopwords.append(word)
-    # ramène les mots à leur racine (lemmatize)
+
+        # ramène les mots à leur racine (lemmatize)
         lemmatized_entree = []
         for word in int_no_stopwords:
             lemmatized_entree.append(lemmatizer.lemmatize(word))
         print(lemmatized_entree)
-
-
-
-    #Stoppe le programme si mauvaise orthographe
         lemmatized_str = " ".join(lemmatized_entree)
+
+        metier = pd.read_csv('job.csv', sep='\t', low_memory=False)
+        for row in metier:
+            liste_metier = row[0]
+            print(liste_metier)
+
         if lemmatized_str not in model.vocab:
-            return exit("Merci de ré-essayer avec une orthographe correcte")
-        else:
-            vec.append((lemmatized_str, model[lemmatized_str]))
-            print(vec)
+            for nom in liste_metier:
+                distance_lev = levenshtein(nom, lemmatized_str)
+                print(distance_lev)
+                # trouver la distance minimum et la print
+
+        # if lemmatized_str not in model.vocab:
+        # return exit("Merci de ré-essayer avec une orthographe correcte")
+
+    # Affichage des vecteurs du candidat
+
+    # vec.append((lemmatized_str, model[lemmatized_str]))
+    # print(vec)
 
     ##################################################################################################
 
