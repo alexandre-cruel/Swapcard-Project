@@ -12,7 +12,7 @@ Our objective is to create a recommendation system to resolve a cold start probl
 - _w2v.py_ : Generate fake clusters based on the GoogleNews' Word2Vec model.
 - _dbScanClustering.py_ : Use Scikit-Learn DBScan to create automatic clusters from vectors in the GoogleNews model.
 ### Recommandation
-- _main.py_ : Gather completes profiles informations from our  database, then  partial _parsing_ of datas.(*Work in progress*)
+- _main.py_ : perform the recommendation.(*Work in progress*)
 
 ## Download the project
 ```bash
