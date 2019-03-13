@@ -128,16 +128,16 @@ def recommendation(args1):
         lemmatized_str = " ".join(lemmatized_entree)
 
         metier = pd.read_csv('job.csv', sep='\t', low_memory=False)
-        for row in metier:
-            liste_metier = row[0]
-            print(liste_metier)
+        liste_metier = metier['libellé métier']
+        for row in liste_metier:
+            print(row)
 
-        if lemmatized_str not in model.vocab:
-            for nom in liste_metier:
+        '''if lemmatized_str not in model.vocab:
+            for nom in metier['libellé métier']:
                 distance_lev = levenshtein(nom, lemmatized_str)
                 print(distance_lev)
                 # trouver la distance minimum et la print
-
+'''
         # if lemmatized_str not in model.vocab:
         # return exit("Merci de ré-essayer avec une orthographe correcte")
 
@@ -149,13 +149,9 @@ def recommendation(args1):
     ##################################################################################################
 
 #Récupération du Cold Start Candidate
-#entree = input("Entrez votre métier: ")
-
+    entree = input("Entrez votre métier: ")
     start_time = time.time()
-
-
-
-    cleaner(args1)
+    cleaner(entree)
 
 
     #faire la moyenne des vecteurs
@@ -200,6 +196,7 @@ def recommendation(args1):
     print('Le pourcentage de mots clusterisés est de :', percent, '%')
     response = response + '\nLe pourcentage de mots clusterisés est de : ' + str(percent) +'%'
 
+    print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
     return response
 
 
@@ -207,7 +204,7 @@ def recommendation(args1):
 
 
 def main(argv):
-    print('ok')
+    recommendation('')
 
 
 if __name__ == "__main__":
@@ -314,6 +311,3 @@ print(pca.explained_variance_ratio_.sum())
 """
 
 ##################################################################################################
-
-
-#print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
