@@ -1,43 +1,68 @@
 from tkinter import *
+import auto_test
 
 
 def Affichage_Profil1():
-    Texte.set('Profil 1 \n blabla \n blabla')
+    Texte.set('Profil 1 \nPROFESSION: Ingénieur\n')
+    global recom
     recom = 1
 
+
 def Affichage_Profil2():
-    Texte.set('Profil 2 \n blabla \n blabla')
+    Texte.set('Profil 2 \nPROFESSION: Cadre\n ')
+    global recom
     recom = 2
 
+
 def Affichage_Profil3():
-    Texte.set('Profil 3 \n blabla \n blabla')
+    Texte.set('Profil 3 \nPROFESSION: Développeur\n')
+    global recom
     recom = 3
 
+
 def Affichage_Profil4():
-    Texte.set('Profil 4 \n blabla \n blabla')
+    Texte.set('Profil 4 \nPROFESSION: RH\n')
+    global recom
     recom = 4
 
+
 def Affichage_Profil5():
-    Texte.set('Profil 5 \n blabla \n blabla')
+    Texte.set('Profil 5 \nPROFESSION: CTO\n')
+    global recom
     recom = 5
 
+
 def Affichage_Profil6():
-    Texte.set('Profil 6 \n blabla \n blabla')
+    Texte.set('Profil 6 \nPROFESSION: CEO\n')
+    global recom
     recom = 6
+
 
 def Recommand():
     if recom == 1:
-        Texte_retour.set('la recommandation du profil 1 est \n blabla')
+        Texte_retour.set('Recommandation en cours, veuillez patienter ...')
+        reponse = auto_test.recommendation('Ingénieur')
+        Texte_retour.set('la recommandation du profil 1 est \n' + reponse)
     elif recom == 2:
-        Texte_retour.set('la recommandation du profil 2 est \n blabla')
+        Texte_retour.set('Recommandation en cours, veuillez patienter ...')
+        reponse = auto_test.recommendation('Cadre')
+        Texte_retour.set('la recommandation du profil 2 est \n' + reponse)
     elif recom == 3:
-        Texte_retour.set('la recommandation du profil 3 est \n blabla')
+        Texte_retour.set('Recommandation en cours, veuillez patienter ...')
+        reponse = auto_test.recommendation('Développeur')
+        Texte_retour.set('la recommandation du profil 3 est \n' + reponse)
     elif recom == 4:
-        Texte_retour.set('la recommandation du profil 4 est \n blabla')
+        Texte_retour.set('Recommandation en cours, veuillez patienter ...')
+        reponse = auto_test.recommendation('RH')
+        Texte_retour.set('la recommandation du profil 4 est \n' + reponse)
     elif recom == 5:
-        Texte_retour.set('la recommandation du profil 5 est \n blabla')
+        Texte_retour.set('Recommandation en cours, veuillez patienter ...')
+        reponse = auto_test.recommendation('CTO')
+        Texte_retour.set('la recommandation du profil 5 est \n' + reponse)
     elif recom == 6:
-        Texte_retour.set('la recommandation du profil 6 est \n blabla')
+        Texte_retour.set('Recommandation en cours, veuillez patienter ...')
+        reponse = auto_test.recommendation('CEO')
+        Texte_retour.set('la recommandation du profil 6 est \n' + reponse)
 
 
 

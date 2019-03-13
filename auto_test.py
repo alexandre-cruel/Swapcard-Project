@@ -16,169 +16,196 @@ from nltk import word_tokenize, WordNetLemmatizer
 from nltk.corpus import stopwords
 from distance import levenshtein
 
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('averaged_perceptron_tagger')
+response = ''
 
+def recommendation(args1):
+    global response
+    
+    
 vec = []
 lemmatizer = WordNetLemmatizer()
 
-#connect to sql db
-db_connection = sql.connect(host='localhost', database='swapcard', user='root', password='coucou74')
+    nltk.download('punkt')
+    nltk.download('stopwords')
+    nltk.download('averaged_perceptron_tagger')
+    nltk.download('wordnet')
 
-#create dataframe from our db
-dfJobTtl = pd.read_sql("select job_title from user where not tags='[]' and not companies='[]' group by job_title order by count(*) desc limit 100", con=db_connection)
-dfJobTtl = dfJobTtl.loc[2:]
-print(dfJobTtl.head())
+    vec = []
+    lemmatizer = WordNetLemmatizer()
 
+    #connect to sql db
+    db_connection = sql.connect(host='localhost', database='swapcard', user='root', password='coucou74')
 
-#take our job title into a string
-text = dfJobTtl.to_string()
-
-#removing the digits from the list
-remove_digits = str.maketrans('', '', digits)
-text2 = text.translate(remove_digits)
-print(text2)
-
-
-#removing characters
-table = str.maketrans({key: ' ' for key in string.punctuation})
-sentences = text2.translate(table).replace('d’', ' ')
+    #create dataframe from our db
+    dfJobTtl = pd.read_sql("select job_title from user where not tags='[]' and not companies='[]' group by job_title order by count(*) desc limit 100", con=db_connection)
+    dfJobTtl = dfJobTtl.loc[2:]
+    print(dfJobTtl.head())
 
 
-#convert string to lowercase
-sentences = sentences.lower()
+    #take our job title into a string
+    text = dfJobTtl.to_string()
 
-#suppression de mots de 2 lettres ou moins
-tab = []
-tab = sentences.split()
-for i in tab:
-    if len(i) < 3:
-        tab.remove(i)
-print(tab)
-chaine = " ".join(tab)
-
-#use of nltk
-tokens = nltk.word_tokenize(chaine)
-print(tokens)
-tagged = nltk.pos_tag(tokens)
-print(tagged[0:6])
+    #removing the digits from the list
+    remove_digits = str.maketrans('', '', digits)
+    text2 = text.translate(remove_digits)
+    print(text2)
 
 
-##################################################################################################
-
-vectors = pickle.load(open('foo','rb'))
-model = KeyedVectors.load_word2vec_format('testvec')
-
-print('Model built')
+    #removing characters
+    table = str.maketrans({key: ' ' for key in string.punctuation})
+    sentences = text2.translate(table).replace('d’', ' ')
 
 
-##################################################################################################
-##################################################################################################
+    #convert string to lowercase
+    sentences = sentences.lower()
 
-def fillveccluster(namelist):
-    for a in namelist:
-        if a in model.vocab:
-            vec.append((a, model[a]))
-    return vec
+    #suppression de mots de 2 lettres ou moins
+    tab = []
+    tab = sentences.split()
+    for i in tab:
+        if len(i) < 3:
+            tab.remove(i)
+    print(tab)
+    chaine = " ".join(tab)
 
-##################################################################################################
+    #use of nltk
+    tokens = nltk.word_tokenize(chaine)
+    print(tokens)
+    tagged = nltk.pos_tag(tokens)
+    print(tagged[0:6])
 
-def cleaner(entree):
-    print("Bonjour, je crois comprendre que vous êtes", entree)
-    entree = entree.lower()
 
-# découpe la chaine de caractère (tokenize)
-    entree = entree.replace('-', ' ').replace('/', ' ')
-    tokenized_entree = word_tokenize(entree)
-    print(tokenized_entree)
+    ##################################################################################################
 
-# supprime les caractères
-    no_caract_entree = []
-    for word in tokenized_entree:
-        if word not in string.punctuation:
-            no_caract_entree.append(word)
-    print(no_caract_entree)
+    vectors = pickle.load(open('foo','rb'))
+    model = KeyedVectors.load_word2vec_format('testvec')
 
-# supprime les stopword
-    stoplist = set(stopwords.words('french'))
-    int_no_stopwords = []
-    for word in no_caract_entree:
-        if word not in stoplist:
-            int_no_stopwords.append(word)
+    print('Model built')
+
+
+    ##################################################################################################
+    ##################################################################################################
+
+    def fillveccluster(namelist):
+        for a in namelist:
+            if a in model.vocab:
+                vec.append((a, model[a]))
+        return vec
+
+    ##################################################################################################
+
+    def cleaner(entree):
+        global response
+        response = response + 'Bonjour, je crois comprendre que vous êtes ' + entree
+        print("Bonjour, je crois comprendre que vous êtes", entree)
+        entree = entree.lower()
+
+    # découpe la chaine de caractère (tokenize)
+        entree = entree.replace('-', ' ').replace('/', ' ')
+        tokenized_entree = word_tokenize(entree)
+        print(tokenized_entree)
 
 # ramène les mots à leur racine (lemmatize)
     lemmatized_entree = []
     for word in int_no_stopwords:
         lemmatized_entree.append(lemmatizer.lemmatize(word))
     print(lemmatized_entree)
+
+    # supprime les stopword
+        stoplist = set(stopwords.words('french'))
+        int_no_stopwords = []
+        for word in no_caract_entree:
+            if word not in stoplist:
+                int_no_stopwords.append(word)
+
+#Stoppe le programme si mauvaise orthographe
     lemmatized_str = " ".join(lemmatized_entree)
-
-
-    metier = pd.read_csv('job.csv', sep='\t', low_memory=False)
-
     if lemmatized_str not in model.vocab:
-        for x in metier:
-            print(levenshtein(lemmatized_str, x))
-            #trouver la distance minimum et la print
-
-
-    #if lemmatized_str not in model.vocab:
-        #return exit("Merci de ré-essayer avec une orthographe correcte")
-#Affichage des vecteurs du candidat
-
-        #vec.append((lemmatized_str, model[lemmatized_str]))
-        #print(vec)
+        return exit("Merci de ré-essayer avec une orthographe correcte")
+    else:
+        vec.append((lemmatized_str, model[lemmatized_str]))
+        print(vec)
 
 ##################################################################################################
 
+    #Stoppe le programme si mauvaise orthographe
+        lemmatized_str = " ".join(lemmatized_entree)
+        if lemmatized_str not in model.vocab:
+            return exit("Merci de ré-essayer avec une orthographe correcte")
+        else:
+            vec.append((lemmatized_str, model[lemmatized_str]))
+            print(vec)
 
+    ##################################################################################################
 
 #Récupération du Cold Start Candidate
-entree = input("Entrez votre métier: ")
+#entree = input("Entrez votre métier: ")
+
 start_time = time.time()
-#Nettoyage de la réponse entrée
-cleaner(entree)
-
-#faire la moyenne des vecteurs
-#dist = KeyedVectors.distance(vec[1], vec[2])                                      #pb car capte pas les deux distances à calculer
-#print(dist)
 
 
 
-#Renvoyer les termes les plus proches de notre candidat
+cleaner(args1)
 
 
-##################################################################################################
+    #faire la moyenne des vecteurs
+    #dist = KeyedVectors.distance(cold_start[1], cold_start[2])                                      #pb car capte pas les deux distances à calculer
+    #print(dist)
 
-vectors = fillveccluster(tokens)
-#pickle.dump(vectors,open('foo','wb'))
+    #Placement du candidate dans nos clusters
 
-dbVec = [v[1] for v in vectors]
 
-cluster = DBSCAN(eps=0.162, min_samples=2, metric='cosine').fit(dbVec)           #pb car ne trouve pas notre mot
+    #Renvoyer les termes les plus proches de notre candidat
+
+
+    ##################################################################################################
+
+cluster = DBSCAN(eps=0 .162,min_samples=2, metric='cosine').fit(dbVec)
 print(cluster.labels_)
 
-##################################################################################################
+    dbVec = [v[1] for v in vectors]
+
+    cluster = DBSCAN(eps=0.162,min_samples=2, metric='cosine').fit(dbVec)
+    print(cluster.labels_)
+
+    ##################################################################################################
 
 
-#compter nombre de clusters
-count = 0
-for i in range(min(cluster.labels_), max(cluster.labels_)):
-    nbr = max(cluster.labels_) +1
-print('On a ', nbr, 'clusters !')
+    #compter nombre de clusters
+    count = 0
+    for i in range(min(cluster.labels_), max(cluster.labels_)):
+        nbr = max(cluster.labels_) +1
+    response = response + '\non a ' + str(nbr) + ' clusteurs !'
+    print('On a ', nbr, 'clusters !')
 
-#compter nombre de mots clusterisés
-num_out = (cluster.labels_ == -1).sum()
-tot = 0
-for i in cluster.labels_:
-    tot = tot +1
-print('On a ', tot, 'mots dans notre liste de métiers')
-print(num_out, 'ne sont pas compris dans un cluster')
+    #compter nombre de mots clusterisés
+    num_out = (cluster.labels_ == -1).sum()
+    tot = 0
+    for i in cluster.labels_:
+        tot = tot +1
+    response = response + 'On a ' + str(tot) + ' mots dans notre liste de métiers\n' + str(num_out) + 'ne sont pas ' \
+                                                                                                      'compris dans ' \
+                                                                                                      'un clusteur '
+    print('On a ', tot, 'mots dans notre liste de métiers')
+    print(num_out, 'ne sont pas compris dans un cluster')
 
-percent = 100 - round(num_out/tot * 100, 2)
-print('Le pourcentage de mots clusterisés est de :', percent, '%')
+    percent = 100 - round(num_out/tot * 100, 2)
+    print('Le pourcentage de mots clusterisés est de :', percent, '%')
+    response = response + '\nLe pourcentage de mots clusterisés est de : ' + str(percent) +'%'
 
+    return response
+
+
+
+
+
+def main(argv):
+    print('ok')
+
+
+if __name__ == "__main__":
+    import sys
+    main(sys.argv)
 
 ##################################################################################################
 """
@@ -282,4 +309,4 @@ print(pca.explained_variance_ratio_.sum())
 ##################################################################################################
 
 
-print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
+#print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
