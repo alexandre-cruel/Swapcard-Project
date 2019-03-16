@@ -19,7 +19,7 @@ Our objective is to create a recommendation system to resolve a cold start probl
 git clone https://github.com/alexandre-cruel/Swapcard-Project 
 ```
 ## Run the project
-You need to install the modules requires in the project.
+You need to install the modules required in the project.
 
 Then run the **front.py**
 
