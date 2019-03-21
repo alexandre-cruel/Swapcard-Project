@@ -12,9 +12,9 @@ from gensim.models import KeyedVectors
 from sklearn.cluster import DBSCAN
 from wordcloud import WordCloud
 from nltk import word_tokenize, WordNetLemmatizer
+from nltk.stem.snowball import SnowballStemmer
 from nltk.corpus import stopwords
 from distance import levenshtein
-
 
 
 nltk.download('punkt')
@@ -112,9 +112,16 @@ def cleaner(entree):
         if word not in stoplist:
             int_no_stopwords.append(word)
 
-# ramène les mots à leur racine (lemmatize)
-    lemmatized_entree = []
+# ramène les mots à leur racine
+    stemmed_entree = []
+    stemmer = SnowballStemmer('french')
     for word in int_no_stopwords:
+        stemmed_entree.append(stemmer.stem(word))
+    print(stemmed_entree)
+
+# ramène les mots à leur forme la plus simple (lemmatize)
+    lemmatized_entree = []
+    for word in stemmed_entree:
         lemmatized_entree.append(lemmatizer.lemmatize(word))
     print(lemmatized_entree)
     lemmatized_str = " ".join(lemmatized_entree)
