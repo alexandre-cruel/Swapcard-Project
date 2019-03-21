@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import pickle
 import string
 import nltk
@@ -31,7 +33,7 @@ def recommendation(args1):
     lemmatizer = WordNetLemmatizer()
 
     # connect to sql db
-    db_connection = sql.connect(host='localhost', database='swapcard', user='root', password='coucou74')
+    db_connection = sql.connect(host='localhost', database='swap_card', user='root', password='password')()
 
     # create dataframe from our db
     dfJobTtl = pd.read_sql(
