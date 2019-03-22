@@ -95,7 +95,7 @@ def cleaner(entree):
     entree = entree.lower()
 
 # découpe la chaine de caractère (tokenize)
-    entree = entree.replace('-', ' ').replace('/', ' ')
+    entree = entree.replace('-', ' ').replace('/', ' ').replace(digits, ' ')
     tokenized_entree = word_tokenize(entree)
     print(tokenized_entree)
 
@@ -177,7 +177,7 @@ cleaner(entree)
 ##################################################################################################
 dbVec = [v[1] for v in vectors]
 
-cluster = DBSCAN(eps=0.3, min_samples=2, metric='cosine').fit(dbVec)
+cluster = DBSCAN(eps=0.5, min_samples=1, metric='cosine').fit(dbVec)
 print(cluster.labels_)
 
 ##################################################################################################
