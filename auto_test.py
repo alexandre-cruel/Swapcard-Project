@@ -22,6 +22,7 @@ nltk.download('stopwords')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('wordnet')
 
+baba = []
 vec = []
 lemmatizer = WordNetLemmatizer()
 
@@ -85,6 +86,7 @@ def fillveccluster(namelist):
     for a in namelist:
         if a in model.vocab:
             vec.append((a, model[a]))
+            baba.append(a)
     return vec
 
 ##################################################################################################
@@ -124,6 +126,7 @@ def cleaner(entree):
         taille_entree = taille_entree +1
         if x in model.vocab:
             vec.append((x, model[x]))
+            baba.append(x)
         elif x not in model.vocab:
 # correction avec distance de levenshtein
             metier = pd.read_csv('jobs.csv', sep='\t', low_memory=False)
@@ -143,6 +146,7 @@ def cleaner(entree):
                 print('Le terme dans le dictionnaire le plus proche du mot saisi est à une distance de:', mini)
                 print('TERME LE PLUS PROCHE', correction)
                 vec.append((correction, model[correction]))
+                baba.append(correction)
         else:
             print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
             return exit("Merci de ré-essayer avec une orthographe correcte")
@@ -169,6 +173,11 @@ dbVec = [v[1] for v in vectors]
 
 cluster = DBSCAN(eps=0.5, min_samples=1, metric='cosine').fit(dbVec)
 print(cluster.labels_)
+#print(vec[0])
+print(baba)
+
+
+
 
 ##################################################################################################
 
