@@ -125,9 +125,9 @@ def cleaner(entree):
         lemmatized_entree.append(lemmatizer.lemmatize(word))
     print(lemmatized_entree)
 
-
+    taille_entree = 0
     for x in lemmatized_entree:
-        taille_entree = count(x)
+        taille_entree = taille_entree +1
         if x in model.vocab:
             vec.append((x, model[x]))
     print('On ajoute', taille_entree, 'mots !')
