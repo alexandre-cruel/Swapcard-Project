@@ -51,21 +51,13 @@ def cleanTag(a):
     a = a.replace('\\u00c9', "É")
     return a
 
-def calclPart(sum, list):
-    tempList = []
-    for i in range(0, len(list)):
-        tempList.append(list[i]*100/sum)
-    return tempList
-
 # - - - - - - - - - Core
 
 # Récupérer les données depuis les clusters
 
-for y in range(0,len(fooTest)):
-    for x in arr2:
-        if x == y:
-            correctIndex.append(y)
-    index = index + 1
+for y in arr2:
+    if y < len(fooTest):
+        correctIndex.append(y)
 
 for x in correctIndex:
     print(x)
@@ -125,6 +117,7 @@ for jobs in correspondingWords:
     print('Data added to final dataframe')
 
 print('Exporting data to CSV ... ')
+dfFinale = dfFinale.drop_duplicates()
 dfFinale.to_csv('finale.csv')
 print('Export done !')
 
