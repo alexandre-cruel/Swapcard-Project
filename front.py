@@ -59,7 +59,7 @@ def Recommand():
         Texte_retour3.set('Les evenements susceptibles de vous intéressé sont: \n' + texte)
     elif recom == 3:
         Texte_retour1.set('Recommandation en cours, veuillez patienter ...')
-        reponse = main.recommendation(str(entree))
+        reponse = main.recommendation(entree.get())
         texte = id_to_label(reponse)
         Texte_retour1.set('Nous recommendons à ce profil les utilisateurs suivants : \n' + texte)
         texte = tag_to_label(reponse)
@@ -96,8 +96,7 @@ Frame_texte = Frame(window, borderwidth=3)
 Frame_texte.pack(side=TOP, padx=10, pady=10)
 
 entree = StringVar()
-
-entree.set("Entrée un métier")
+entree.set("Entrez un métier")
 Wentree= Entry(Frame_texte, textvariable=entree)
 
 Texte = StringVar()
