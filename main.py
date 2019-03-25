@@ -90,6 +90,7 @@ def recommendation(args1):
 
     ##################################################################################################
 
+
     def cleaner(entree):
         global response
         response = response + 'Bonjour, je crois comprendre que vous êtes ' + entree

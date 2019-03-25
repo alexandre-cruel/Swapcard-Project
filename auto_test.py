@@ -153,7 +153,6 @@ def cleaner(entree):
     print(vec)
 
 
-
 ##################################################################################################
 
 #Récupération du Cold Start Candidate
