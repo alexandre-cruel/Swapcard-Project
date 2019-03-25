@@ -154,7 +154,12 @@ def recommendation(args1):
         # Affichage des vecteurs du candidat
         print(vec)
 
+    ##################################################################################################
 
+    # Récupération du Cold Start Candidate
+    entree = input("Entrez votre métier: ")
+    start_time = time.time()
+    cleaner(entree)
 
 
     ##################################################################################################
