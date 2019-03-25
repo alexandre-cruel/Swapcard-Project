@@ -124,16 +124,24 @@ def cleaner(entree):
     for word in stemmed_entree:
         lemmatized_entree.append(lemmatizer.lemmatize(word))
     print(lemmatized_entree)
-    lemmatized_str = " ".join(lemmatized_entree)
 
+
+    for x in lemmatized_entree:
+        taille_entree = len(x)
+        if x in model.vocab:
+            vec.append((x, model[x]))
+        print(taille_entree)
+
+# CORRECTION AVEC DISTANCE DE LEVENSHTEIN
+    lemmatized_str = " ".join(lemmatized_entree)
     metier = pd.read_csv('jobs.csv', sep='\t', low_memory=False)
     liste_metier = metier['libellé métier']
 
 
-# propose une correction de l'orthographe
     if lemmatized_str not in model.vocab:
         mini = 100
         monmot = None
+        correction = None
 
         # trouver la distance minimum et la print
         for nom in liste_metier:
@@ -141,19 +149,20 @@ def cleaner(entree):
             if distance_lev < mini:
                  monmot = nom
             mini = min(mini, distance_lev)
+            if distance_lev < 5:
+                correction = monmot
 
         print('Le terme dans le dictionnaire le plus proche du mot saisi est à une distance de:', mini)
-        print('TERME LE PLUS PROCHE', monmot)
-
+        print('TERME LE PLUS PROCHE', correction)
 
 
     if lemmatized_str not in model.vocab:
+        print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
         return exit("Merci de ré-essayer avec une orthographe correcte")
 
-# Affichage des vecteurs du candidat
 
-# vec.append((lemmatized_str, model[lemmatized_str]))
-# print(vec)
+# Affichage des vecteurs du candidat
+        print(vec)
 
 ##################################################################################################
 
@@ -168,20 +177,22 @@ cleaner(entree)
 # #pb car capte pas les deux distances à calculer
 #print(dist)
 
-#Placement du candidate dans nos clusters
+
 
 
 #Renvoyer les termes les plus proches de notre candidat
 
 
 ##################################################################################################
+vectors = fillveccluster(tokens)
+#pickle.dump(vectors,open('foo','wb'))
+
 dbVec = [v[1] for v in vectors]
 
 cluster = DBSCAN(eps=0.5, min_samples=1, metric='cosine').fit(dbVec)
 print(cluster.labels_)
 
 ##################################################################################################
-
 
 #compter nombre de clusters
 count = 0
