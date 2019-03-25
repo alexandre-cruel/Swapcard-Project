@@ -95,7 +95,7 @@ def cleaner(entree):
     entree = entree.lower()
 
 # découpe la chaine de caractère (tokenize)
-    entree = entree.replace('-', ' ').replace('/', ' ').replace(digits, ' ')
+    entree = entree.replace('-', ' ').replace('/', ' ').replace(digits, ' '). replace("d'", ' ')
     tokenized_entree = word_tokenize(entree)
     print(tokenized_entree)
 
@@ -127,11 +127,14 @@ def cleaner(entree):
 
 
     for x in lemmatized_entree:
-        taille_entree = len(x)
+        taille_entree = count(x)
         if x in model.vocab:
             vec.append((x, model[x]))
-        print(taille_entree)
+    print('On ajoute', taille_entree, 'mots !')
+    # Affichage des vecteurs du candidat
+    print(vec)
 
+"""
 # CORRECTION AVEC DISTANCE DE LEVENSHTEIN
     lemmatized_str = " ".join(lemmatized_entree)
     metier = pd.read_csv('jobs.csv', sep='\t', low_memory=False)
@@ -159,10 +162,9 @@ def cleaner(entree):
     if lemmatized_str not in model.vocab:
         print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
         return exit("Merci de ré-essayer avec une orthographe correcte")
+"""
 
 
-# Affichage des vecteurs du candidat
-        print(vec)
 
 ##################################################################################################
 
