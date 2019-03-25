@@ -125,44 +125,43 @@ def cleaner(entree):
         lemmatized_entree.append(lemmatizer.lemmatize(word))
     print(lemmatized_entree)
 
+
+
+# ajoute les mots dans notre vecteur
     taille_entree = 0
     for x in lemmatized_entree:
         taille_entree = taille_entree +1
         if x in model.vocab:
             vec.append((x, model[x]))
+        elif x not in model.vocab:
+# correction avec distance de levenshtein
+            metier = pd.read_csv('jobs.csv', sep='\t', low_memory=False)
+            liste_metier = metier['libellé métier']
+            mini = 100
+            monmot = None
+            correction = None
+
+# trouver la distance minimum et la print
+            for nom in liste_metier:
+                distance_lev = levenshtein(nom, x)
+                if distance_lev < mini:
+                    monmot = nom
+                mini = min(mini, distance_lev)
+                if distance_lev < 5:
+                    correction = monmot
+                    print('Le terme dans le dictionnaire le plus proche du mot saisi est à une distance de:', mini)
+                    print('TERME LE PLUS PROCHE', correction)
+                    vec.append((correction, model[correction]))
+        else:
+            print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
+            return exit("Merci de ré-essayer avec une orthographe correcte")
+            print('Le terme dans le dictionnaire le plus proche du mot saisi est à une distance de:', mini)
+            print('TERME LE PLUS PROCHE', correction)
+
+#donne le nombre de mots que l'on va donner à DBSCAN
     print('On ajoute', taille_entree, 'mots !')
     # Affichage des vecteurs du candidat
     print(vec)
-
-"""
-# CORRECTION AVEC DISTANCE DE LEVENSHTEIN
-    lemmatized_str = " ".join(lemmatized_entree)
-    metier = pd.read_csv('jobs.csv', sep='\t', low_memory=False)
-    liste_metier = metier['libellé métier']
-
-
-    if lemmatized_str not in model.vocab:
-        mini = 100
-        monmot = None
-        correction = None
-
-        # trouver la distance minimum et la print
-        for nom in liste_metier:
-            distance_lev = levenshtein(nom, lemmatized_str)
-            if distance_lev < mini:
-                 monmot = nom
-            mini = min(mini, distance_lev)
-            if distance_lev < 5:
-                correction = monmot
-
-        print('Le terme dans le dictionnaire le plus proche du mot saisi est à une distance de:', mini)
-        print('TERME LE PLUS PROCHE', correction)
-
-
-    if lemmatized_str not in model.vocab:
-        print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
-        return exit("Merci de ré-essayer avec une orthographe correcte")
-"""
 
 
 
