@@ -19,15 +19,16 @@ plt.figure(figsize=(20,20))
 
 # - - - - - - - - - Var
 
-arr1 = ['Analyst', 'ingénieur', 'marketing', 'ingénieur']
+arr1 = ['chef', 'entrepris', 'marketing', 'ingénieur']
 arr2 = [0, 1, 2, 0]
+fooTest = [0, 1]
 
 index = 0
 correctIndex = []
 correspondingWords = []
-tagsTab = []
-eventTab = []
-connTab = []
+
+dfFinale = pd.DataFrame()
+
 
 # - - - - - - - - - Functions
 def fillList(list):
@@ -60,66 +61,72 @@ def calclPart(sum, list):
 
 # Récupérer les données depuis les clusters
 
-for x in arr2:
-    if x == 0:
-        correctIndex.append(index)
+for y in range(0,len(fooTest)):
+    for x in arr2:
+        if x == y:
+            correctIndex.append(y)
     index = index + 1
 
 for x in correctIndex:
+    print(x)
     correspondingWords.append(arr1[x])
+    print(correspondingWords)
 
 
-# Requête la base pour sortir les infos correspondantes :
-#   - Tags
-#   - Events
-#   - What else ?
+def requests(name):
+    tags_tab = []
+    event_tab = []
+    connTab = []
 
-# df = pd.read_sql("select * from user where job_title like '%" + correspondingWords[0] + "%'", con=db_connection)
+    swap_tags = pd.read_sql("select tags from user where not tags='[]' and job_title like '%" + name + "%'", con=db_connection)
+    swap_events = pd.read_sql("select planning.categories from user join event_attendee ON event_attendee.user_id=user.id join planning on planning.event_id = event_attendee.event_id where user.job_title like '%" + name + "%' and not planning.categories='[]'", con=db_connection)
+    swap_conn = pd.read_sql("select connection.user_id, count(*) as 'count' from connection join user on user.id = connection.user_id where user.job_title like '%" + name + "%' group by user_id order by count(*) desc", con=db_connection)
 
-swapTags = pd.read_sql("select tags from user where not tags='[]' and job_title like '%" + correspondingWords[0] + "%'", con=db_connection)
-swapEvents = pd.read_sql("select user.job_title, planning.categories from user join event_attendee ON event_attendee.user_id=user.id join planning on planning.event_id = event_attendee.event_id where user.job_title like '%" + correspondingWords[0] + "%' and not planning.categories='[]'", con=db_connection)
-swapConn = pd.read_sql("select user.job_title, connection.user_id, count(*) as 'count' from connection join user on user.id = connection.user_id where user.job_title like '%" + correspondingWords[0] + "%' group by user_id order by count(*) desc", con=db_connection)
+    # - - - - - - - - Parse data a little
+    # TAGS
+    for tagsRow in swap_tags.tags:
+        tagsRow = cleanTag(tagsRow)
+        tempTab = tagsRow.split(",")
+        for tag in tempTab:
+            tags_tab.append(tag)
 
-# - - - - - - - - Parse data a little
+    # Event
+    for eventRow in swap_events.categories:
+        eventRow = cleanTag(eventRow)
+        event_tab.append(eventRow)
 
-# TAGS
-for tagsRow in swapTags.tags:
-    tagsRow = cleanTag(tagsRow)
-    tempTab = tagsRow.split(",")
-    for tag in tempTab:
-        tagsTab.append(tag)
+    # Créer une dataframe des datas pour manipuler
 
-# Event
-for eventRow in swapEvents.categories:
-    eventRow = cleanTag(eventRow)
-    eventTab.append(eventRow)
+    user_data = pd.DataFrame({'tags': tags_tab})
+    user_data = user_data.join(pd.DataFrame({'events': event_tab}))
+    user_data = user_data.join(swap_conn['user_id'])
+    user_data = user_data.join(swap_conn['count'])
 
-# Créer une dataframe de tous les tags pour les manipuler
+    temp1 = user_data['tags'].value_counts()
+    temp2 = user_data['events'].value_counts()
 
-userData = pd.DataFrame({'tags': tagsTab})
-userData = userData.join(pd.DataFrame({'events': eventTab}))
-userData = userData.join(swapConn['user_id'])
-userData = userData.join(swapConn['count'])
+    user_data = user_data.join(pd.DataFrame({'tagsRankingName': temp1.index.tolist()}))
+    user_data = user_data.join(pd.DataFrame({'tagsRankingVal': fillList(temp1)}))
+    user_data = user_data.join(pd.DataFrame({'eventRankingName': temp2.index.tolist()}))
+    user_data = user_data.join(pd.DataFrame({'eventRankingVal': fillList(temp2)}))
 
+    user_data.drop('tags', axis=1, inplace=True)
+    user_data.drop('events', axis=1, inplace=True)
 
-temp1 = userData['tags'].value_counts()
-temp2 = userData['events'].value_counts()
+#    user_data[0:3].to_csv(correspondingWords[0] + 'Data.csv')
 
-#tagImpact = calclPart(userData['tags'].sum(), temp1)
-#eventImpact = calclPart(userData['events'].sum(), temp2)
-
-userData = userData.join(pd.DataFrame({'tagsRankingName': temp1.index.tolist()}))
-userData = userData.join(pd.DataFrame({'tagsRankingVal': fillList(temp1)}))
-userData = userData.join(pd.DataFrame({'eventRankingName': temp2.index.tolist()}))
-userData = userData.join(pd.DataFrame({'eventRankingVal': fillList(temp2)}))
+    return user_data.iloc[:3]
 
 
-userData.drop('tags', axis=1, inplace=True)
-userData.drop('events', axis=1, inplace=True)
+for jobs in correspondingWords:
+    print('Starting new requests ... ')
+    frames = [dfFinale,requests(jobs)]
+    dfFinale = pd.concat(frames)
+    print('Data added to final dataframe')
 
-print(userData[0:3])
-
-userData[0:3].to_csv(correspondingWords[0]+'Data.csv')
+print('Exporting data to CSV ... ')
+dfFinale.to_csv('finale.csv')
+print('Export done !')
 
 # - - - - - - - - Ploting datas
 
