@@ -162,17 +162,6 @@ start_time = time.time()
 cleaner(entree)
 
 
-#faire la moyenne des vecteurs
-#dist = KeyedVectors.distance(cold_start[1], cold_start[2])
-# #pb car capte pas les deux distances à calculer
-#print(dist)
-
-
-
-
-#Renvoyer les termes les plus proches de notre candidat
-
-
 ##################################################################################################
 vectors = fillveccluster(tokens)
 #pickle.dump(vectors,open('foo','wb'))

@@ -97,7 +97,7 @@ def recommendation(args1):
         entree = entree.lower()
 
         # découpe la chaine de caractère (tokenize)
-        entree = entree.replace('-', ' ').replace('/', ' ')
+        entree = entree.replace('-', ' ').replace('/', ' ').replace(digits, ' ').replace("d'", ' ')
         tokenized_entree = word_tokenize(entree)
         print(tokenized_entree)
 
@@ -113,42 +113,55 @@ def recommendation(args1):
         for word in no_caract_entree:
             if word not in stoplist:
                 int_no_stopwords.append(word)
-        # ramène les mots à leur racine (lemmatize)
+
+        # ramène les mots à leur forme la plus simple (lemmatize)
         lemmatized_entree = []
         for word in int_no_stopwords:
             lemmatized_entree.append(lemmatizer.lemmatize(word))
         print(lemmatized_entree)
 
-        # Stoppe le programme si mauvaise orthographe
-        lemmatized_str = " ".join(lemmatized_entree)
-        if lemmatized_str not in model.vocab:
-            return exit("Merci de ré-essayer avec une orthographe correcte")
-        else:
-            vec.append((lemmatized_str, model[lemmatized_str]))
-            print(vec)
+        # ajoute les mots dans notre vecteur
+        taille_entree = 0
+        for x in lemmatized_entree:
+            taille_entree = taille_entree + 1
+            if x in model.vocab:
+                vec.append((x, model[x]))
+            elif x not in model.vocab:
+                # correction avec distance de levenshtein
+                metier = pd.read_csv('jobs.csv', sep='\t', low_memory=False)
+                liste_metier = metier['libellé métier']
+                mini = 100
+                monmot = None
+
+                # trouver la distance minimum et la print
+                for nom in liste_metier:
+                    distance_lev = levenshtein(nom, x)
+                    if distance_lev < mini:
+                        monmot = nom
+                    mini = min(mini, distance_lev)
+                    while distance_lev > 5:
+                        return exit("Merci de ré-essayer avec une orthographe correcte")
+                    correction = monmot
+                    print('Le terme dans le dictionnaire le plus proche du mot saisi est à une distance de:', mini)
+                    print('TERME LE PLUS PROCHE', correction)
+                    vec.append((correction, model[correction]))
+            else:
+                print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
+                return exit("Merci de ré-essayer avec une orthographe correcte")
+
+        # donne le nombre de mots que l'on va donner à DBSCAN
+        print('On ajoute', taille_entree, 'mots !')
+        # Affichage des vecteurs du candidat
+        print(vec)
+
+
+
 
     ##################################################################################################
-
-    # Récupération du Cold Start Candidate
-    # entree = input("Entrez votre métier: ")
-
-    start_time = time.time()
-
-    cleaner(args1)
-
-    # faire la moyenne des vecteurs
-    # dist = KeyedVectors.distance(cold_start[1], cold_start[2])
-    # #pb car capte pas les deux distances à calculer
-    # print(dist)
-
-    # Placement du candidate dans nos clusters
-
-    # Renvoyer les termes les plus proches de notre candidat
-
-    ##################################################################################################
+    vectors = fillveccluster(tokens)
     dbVec = [v[1] for v in vectors]
 
-    cluster = DBSCAN(eps=0.162, min_samples=2, metric='cosine').fit(dbVec)
+    cluster = DBSCAN(eps=0.5, min_samples=1, metric='cosine').fit(dbVec)
     print(cluster.labels_)
 
     ##################################################################################################
