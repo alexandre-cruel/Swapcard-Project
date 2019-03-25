@@ -155,8 +155,6 @@ def cleaner(entree):
         else:
             print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
             return exit("Merci de ré-essayer avec une orthographe correcte")
-            print('Le terme dans le dictionnaire le plus proche du mot saisi est à une distance de:', mini)
-            print('TERME LE PLUS PROCHE', correction)
 
 #donne le nombre de mots que l'on va donner à DBSCAN
     print('On ajoute', taille_entree, 'mots !')
