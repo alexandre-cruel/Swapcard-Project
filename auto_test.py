@@ -112,20 +112,11 @@ def cleaner(entree):
         if word not in stoplist:
             int_no_stopwords.append(word)
 
-# ramène les mots à leur racine
-    stemmed_entree = []
-    stemmer = SnowballStemmer('french')
-    for word in int_no_stopwords:
-        stemmed_entree.append(stemmer.stem(word))
-    print(stemmed_entree)
-
 # ramène les mots à leur forme la plus simple (lemmatize)
     lemmatized_entree = []
-    for word in stemmed_entree:
+    for word in int_no_stopwords:
         lemmatized_entree.append(lemmatizer.lemmatize(word))
     print(lemmatized_entree)
-
-
 
 # ajoute les mots dans notre vecteur
     taille_entree = 0
@@ -139,7 +130,6 @@ def cleaner(entree):
             liste_metier = metier['libellé métier']
             mini = 100
             monmot = None
-            correction = None
 
 # trouver la distance minimum et la print
             for nom in liste_metier:
@@ -147,11 +137,12 @@ def cleaner(entree):
                 if distance_lev < mini:
                     monmot = nom
                 mini = min(mini, distance_lev)
-                if distance_lev < 5:
-                    correction = monmot
-                    print('Le terme dans le dictionnaire le plus proche du mot saisi est à une distance de:', mini)
-                    print('TERME LE PLUS PROCHE', correction)
-                    vec.append((correction, model[correction]))
+                while distance_lev > 5:
+                    return exit("Merci de ré-essayer avec une orthographe correcte")
+                correction = monmot
+                print('Le terme dans le dictionnaire le plus proche du mot saisi est à une distance de:', mini)
+                print('TERME LE PLUS PROCHE', correction)
+                vec.append((correction, model[correction]))
         else:
             print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
             return exit("Merci de ré-essayer avec une orthographe correcte")
