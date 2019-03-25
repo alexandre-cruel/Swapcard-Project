@@ -30,6 +30,7 @@ def recommendation(args1):
     nltk.download('wordnet')
 
     vec = []
+    baba = []
     lemmatizer = WordNetLemmatizer()
 
     # connect to sql db
@@ -82,10 +83,12 @@ def recommendation(args1):
     ##################################################################################################
     ##################################################################################################
 
+
     def fillveccluster(namelist):
         for a in namelist:
             if a in model.vocab:
                 vec.append((a, model[a]))
+                baba.append(a)
         return vec
 
     ##################################################################################################
@@ -128,6 +131,7 @@ def recommendation(args1):
             taille_entree = taille_entree + 1
             if x in model.vocab:
                 vec.append((x, model[x]))
+                baba.append(x)
             elif x not in model.vocab:
                 # correction avec distance de levenshtein
                 metier = pd.read_csv('jobs.csv', sep='\t', low_memory=False)
@@ -147,28 +151,29 @@ def recommendation(args1):
                     print('Le terme dans le dictionnaire le plus proche du mot saisi est à une distance de:', mini)
                     print('TERME LE PLUS PROCHE', correction)
                     vec.append((correction, model[correction]))
+                    baba.append(correction)
             else:
                 print("----- TEMPS DE REPONSE : %s secondes ----- " % (time.time() - start_time))
                 return exit("Merci de ré-essayer avec une orthographe correcte")
 
-        # donne le nombre de mots que l'on va donner à DBSCAN
-    print('On ajoute', taille_entree, 'mots !')
-    # Affichage des vecteurs du candidat
-    print(vec)
+            # donne le nombre de mots que l'on va donner à DBSCAN
+        print('On ajoute', taille_entree, 'mots !')
+            # Affichage des vecteurs du candidat
+        print(vec)
 
     ##################################################################################################
 
     # Récupération du Cold Start Candidate
     entree = input("Entrez votre métier: ")
     start_time = time.time()
-    cleaner(entree)
+    entreeclean = cleaner(entree)
 
 
     ##################################################################################################
     vectors = fillveccluster(tokens)
     dbVec = [v[1] for v in vectors]
 
-    cluster = DBSCAN(eps=0.5, min_samples=1, metric='cosine').fit(dbVec)
+    cluster = DBSCAN(eps=0.3, min_samples=2, metric='cosine').fit(dbVec)
     print(cluster.labels_)
 
     ##################################################################################################
@@ -197,7 +202,7 @@ def recommendation(args1):
 
     # - - - - - - - - - Var
 
-    arr1 = vec
+    arr1 = baba
     arr2 = cluster.labels_
     fooTest = 1
 
@@ -230,14 +235,16 @@ def recommendation(args1):
 
     # Récupérer les données depuis les clusters
 
+    cntr = 0
+    indexCluster = 0
     for y in arr2:
-        if y < fooTest:
-            correctIndex.append(y)
+        if y < fooTest and cntr < 5:
+            correctIndex.append(indexCluster)
+            cntr = cntr + 1
+        indexCluster = indexCluster + 1
 
     for x in correctIndex:
-        print(x)
         correspondingWords.append(arr1[x])
-        print(correspondingWords)
 
     def requests(name):
         tags_tab = []
@@ -286,7 +293,8 @@ def recommendation(args1):
 
         #    user_data[0:3].to_csv(correspondingWords[0] + 'Data.csv')
 
-        return user_data.iloc[:3]
+        return user_data.iloc[:2]
+
 
     for jobs in correspondingWords:
         print('Starting new requests ... ')
